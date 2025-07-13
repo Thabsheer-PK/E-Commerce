@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const { getDB } = require('../config/connect');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -115,7 +116,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/add-product',(req,res)=>{
-  res.render('admin/add-product-form')
+  res.render('admin/add-product-form',{admin:true})
 })
 
 router.post('/add-product',(req,res)=>{

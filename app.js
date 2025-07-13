@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const { connectDB } = require('./config/connect');
 
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
@@ -10,6 +11,8 @@ var exphbs = require('express-handlebars')
 var fileUpload = require('express-fileupload')
 
 var app = express();
+
+connectDB();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
