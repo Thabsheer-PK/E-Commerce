@@ -1,3 +1,19 @@
 *{
   box-sizing: border-box;
 }
+.dropdown-menu {
+  right: 0 !important;
+  left: auto !important;
+}
+.product-section{
+  margin-top: -1rem;
+}
+.custom-image{
+  width: 15rem;
+  height: 15rem;
+  object-fit: cover;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+

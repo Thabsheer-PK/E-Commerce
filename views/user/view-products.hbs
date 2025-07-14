@@ -1,0 +1,23 @@
+<section class="product-section mt-4">
+  <div class="container-fluid">
+    <div class="row">
+      {{#each products}}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card h-80 text-start">
+          <img 
+            class="img-fluid custom-image"
+            src="/product-images/{{this._id}}.jpg"
+            alt="{{this.Name}}"
+          >
+          <div class="card-body">
+            <h5 class="card-title">{{this.Name}}</h5>
+            <p class="card-text">{{this.Description}}</p>
+            <p class="card-text font-weight-bold">₹{{this.Price}}</p>
+            <a href="#" class="btn btn-primary">Add to Cart</a>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>

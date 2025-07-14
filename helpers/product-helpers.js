@@ -4,7 +4,7 @@ const collection = require('../config/collections')
 module.exports = {
   addProduct: async (product) => {
     await getDB().collection(collection.PRODUCT_COLLECTION).insertOne(product);
-    return product._id.toString();
+    return product._id.toString();//this return image id
   },
   getAllProducts:()=>{ // can deal with asyn or callback or promise ,now we with deal promise
     return new Promise (async (resolve,reject)=>{
@@ -15,7 +15,6 @@ module.exports = {
           ...product,_id: product._id.toString()
         }
       })
-      console.log(products);
       resolve(products)
     })
   }
