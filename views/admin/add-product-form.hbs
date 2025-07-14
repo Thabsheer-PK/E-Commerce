@@ -6,23 +6,23 @@
         <form action="/admin/add-product" method="post" enctype="multipart/form-data">
           <div class="form-group">
             <label for="inputForName">Name</label>
-            <input id="inputForName" type="text" class="form-control" name='Name' placeholder="Enter Product Name">
+            <input id="inputForName" type="text" class="form-control" name='Name' required placeholder="Enter Product Name">
           </div>
           <div class="form-group">
             <label for="inputForCategory">Categoy</label>
-            <input id="inputForCategory" type="text" class="form-control" name='Category' placeholder="Enter Product Category">
+            <input id="inputForCategory" type="text" class="form-control" name='Category' required placeholder="Enter Product Category">
           </div>
           <div class="form-group">
             <label for="inputForPrice">Price</label>
-            <input id="inputForPrice" type="text" class="form-control" name='Price' placeholder="Enter Product Price">
+            <input id="inputForPrice" type="text" class="form-control" name='Price' required placeholder="Enter Product Price">
           </div>
           <div class="form-group">
             <label for="inputForDescription">Description</label>
-            <input id="inputForDescription" type="text" class="form-control" name='Description' placeholder="Enter Product Description">
+            <input id="inputForDescription" type="text" class="form-control" name='Description' required placeholder="Enter Product Description">
           </div>
           <div class="form-group">
             <label for="inputForimage">Upload Product Image</label>
-            <input id="inputForimage" type="file" class="form-control" name='Image'>
+            <input id="inputForimage" type="file" required class="form-control" name='Image'>
           </div>
 
           <button type="submit" class="btn btn-success mt-2">Submit</button>
