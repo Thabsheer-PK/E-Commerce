@@ -22,11 +22,11 @@
           </div>
           <div class="form-group">
            <label for="">Image</label>
-            <img src="/product-images/{{product._id}}.jpg" style="width: 100px; height:auto" alt="">
+            <img src="/product-images/{{product._id}}.jpg" style="width: 100px; height:auto" alt="" id="viewImage">
           </div>
           <div class="form-group">
             <label for="inputForimage">Upload Product Image</label>
-            <input id="inputForimage" type="file" class="form-control" name='Image' >
+            <input id="inputForimage" type="file" class="form-control" name='Image' required>
           </div>
 
           <button type="submit" class="btn btn-success mt-2">Submit</button>
@@ -36,3 +36,17 @@
     </div>
   </div>
 </section>
+
+<script>
+  document.getElementById('inputForimage').addEventListener('change',(event)=>{
+    console.log(event)
+    const file = event.target.files[0];
+    if(file){
+      const image = document.getElementById('viewImage');
+      image.src = URL.createObjectURL(file);
+      image.onload = ()=>{
+        URL.revokeObjectURL(image.src) // // this remove temperory object url after image change
+      }
+    }
+  })
+</script>

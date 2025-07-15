@@ -46,9 +46,7 @@ router.post('/edit-product/:id', async (req, res) => {
           res.redirect('/admin/')
         }
       })
-      
     }
-    
   })
 })
 
