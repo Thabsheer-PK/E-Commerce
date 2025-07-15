@@ -5,8 +5,9 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
+  let user = req.session.user;
   productHelpers.getAllProducts().then((products) => {
-    res.render('user/view-products', { admin: false, products })
+    res.render('user/view-products', { admin: false, products, user })
   })
 });
 
@@ -14,10 +15,12 @@ router.get('/login', (req, res, next) => {
   res.render('user/login')
 })
 router.post('/login', (req, res) => {
-  userHelpers.doLogin(req.body).then((response)=>{
-    if(response.status){
+  userHelpers.doLogin(req.body).then((response) => {
+    if (response.status) {
+      req.session.Loggedin = true;
+      req.session.user = response.user;
       res.redirect('/');
-    }else{
+    } else {
       res.redirect('/login');
     }
   })
