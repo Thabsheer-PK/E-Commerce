@@ -25,6 +25,10 @@ router.post('/login', (req, res) => {
     }
   })
 })
+router.get('/logout',(req,res,next)=>{
+  req.session.destroy();
+  res.redirect('/')
+})
 
 router.get('/signup', (req, res, next) => {
   res.render('user/signup')
@@ -35,5 +39,6 @@ router.post('/signup', (req, res, next) => {
   })
   res.redirect('/');
 })
+
 
 module.exports = router;
