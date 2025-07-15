@@ -6,10 +6,11 @@ module.exports = {
   doSignup: (userData) => {
     return new Promise(async (resolve, reject) => {
       userData.Password = await bcrypt.hash(userData.Password, 10);
-      getDB().collection(collection.USER_COLLECTION).insertOne(userData).then((data) => {
-        resolve(data)
+      getDB().collection(collection.USER_COLLECTION).insertOne(userData).then(async (data) => {
+        let insertedId = data.insertedId;
+        let user = await getDB().collection(collection.USER_COLLECTION).findOne({_id:insertedId})
+        resolve(user)
       })
-
     })
   },
   doLogin: async (userData) => {

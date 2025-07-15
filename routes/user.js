@@ -14,7 +14,6 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
 /* GET home page. */
 router.get('/', function (req, res, next) {
   let user = req.session.user;
-
   productHelpers.getAllProducts().then((products) => {
     res.render('user/view-products', { admin: false, products, user })
   })
@@ -47,13 +46,21 @@ router.get('/logout', (req, res, next) => {
 })
 
 router.get('/signup', (req, res, next) => {
-  res.render('user/signup')
+  res.set('Cache-Control', 'no-store'); //no cache stored in browser
+  if(req.session.Loggedin){
+    res.redirect('/')
+  }else{
+    res.render('user/signup')
+  }
+  
 })
 router.post('/signup', (req, res, next) => {
-  userHelpers.doSignup(req.body).then((response) => {
-    console.log(response);
+  userHelpers.doSignup(req.body).then((user) => {
+    req.session.Loggedin = true;
+    req.session.user = user;
+    res.redirect('/');
   })
-  res.redirect('/');
+  
 })
 
 router.get('/cart', verifyLogin, (req, res, next) => {
