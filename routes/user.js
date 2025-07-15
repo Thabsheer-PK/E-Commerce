@@ -6,13 +6,20 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function (req, res, next) {
   let user = req.session.user;
+
   productHelpers.getAllProducts().then((products) => {
     res.render('user/view-products', { admin: false, products, user })
   })
 });
 
 router.get('/login', (req, res, next) => {
-  res.render('user/login')
+  res.set('Cache-Control', 'no-store'); //no cache stored in browser
+  if(req.session.Loggedin){
+    res.redirect('/');
+  }else{
+      res.render('user/login',{loginErr:req.session.loginErr})
+  }
+
 })
 router.post('/login', (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
@@ -21,6 +28,7 @@ router.post('/login', (req, res) => {
       req.session.user = response.user;
       res.redirect('/');
     } else {
+      req.session.loginErr = "inavlid username or password";
       res.redirect('/login');
     }
   })
@@ -40,5 +48,8 @@ router.post('/signup', (req, res, next) => {
   res.redirect('/');
 })
 
+router.get('/cart',(req,res,next)=>{
+  res.render('user/cart.hbs')
+})
 
 module.exports = router;
