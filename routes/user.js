@@ -30,6 +30,7 @@ router.post('/signup', (req, res, next) => {
   userHelpers.doSignup(req.body).then((response) => {
     console.log(response);
   })
+  res.redirect('/');
 })
 
 module.exports = router;
