@@ -21,15 +21,35 @@ router.post('/add-product', async (req, res) => {
   res.render('admin/add-product-form', { admin: true });
 })
 
-router.get('/deleteProduct/:id',(req,res,next)=>{
+router.get('/deleteProduct/:id', (req, res, next) => {
   let productID = req.params.id;
-  productHelpers.deleteProduct(productID).then((response)=>{
+  productHelpers.deleteProduct(productID).then((response) => {
     console.log(response);
     res.redirect('/admin/')
   })
-  
-  
 })
 
+router.get('/editProduct/:id', async (req, res, next) => {
+  let product = await productHelpers.getProductDetails(req.params.id)
+  res.render('admin/edit-product', { product });
+})
+
+router.post('/edit-product/:id', async (req, res) => {
+  productHelpers.updateProduct(req.params.id, req.body).then(() => {
+    let id = req.params.id;
+    if (req.files.Image) {
+      let image = req.files.Image;
+      image.mv('./public/product-images/'+id+'.jpg',(err)=>{
+        if(err){
+          console.log('uploading image error');
+        }else{
+          res.redirect('/admin/')
+        }
+      })
+      
+    }
+    
+  })
+})
 
 module.exports = router;

@@ -1,0 +1,38 @@
+<section>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="text-center mt-3">Edit Product</h2>
+        <form action="/admin/edit-product/{{product._id}}" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="inputForName">Name</label>
+            <input id="inputForName" type="text" class="form-control" name='Name' required placeholder="Enter Product Name" value="{{product.Name}}">
+          </div>
+          <div class="form-group">
+            <label for="inputForCategory">Category</label>
+            <input id="inputForCategory" type="text" class="form-control" name='Category' required placeholder="Enter Product Category" value="{{product.Category}}">
+          </div>
+          <div class="form-group">
+            <label for="inputForPrice">Price</label>
+            <input id="inputForPrice" type="text" class="form-control" name='Price' required placeholder="Enter Product Price" value="{{product.Price}}">
+          </div>
+          <div class="form-group">
+            <label for="inputForDescription">Description</label>
+            <input id="inputForDescription" type="text" class="form-control" name='Description' required placeholder="Enter Product Description" value="{{product.Description}}">
+          </div>
+          <div class="form-group">
+           <label for="">Image</label>
+            <img src="/product-images/{{product._id}}.jpg" style="width: 100px; height:auto" alt="">
+          </div>
+          <div class="form-group">
+            <label for="inputForimage">Upload Product Image</label>
+            <input id="inputForimage" type="file" class="form-control" name='Image' >
+          </div>
+
+          <button type="submit" class="btn btn-success mt-2">Submit</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
