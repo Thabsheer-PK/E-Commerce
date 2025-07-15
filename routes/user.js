@@ -2,6 +2,14 @@ var express = require('express');
 const productHelpers = require('../helpers/product-helpers');
 const userHelpers = require('../helpers/user-helpers')
 var router = express.Router();
+const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
+  if (req.session.Loggedin) {
+    next();
+  } else {
+    res.redirect('/login')
+  }
+
+}
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -14,10 +22,10 @@ router.get('/', function (req, res, next) {
 
 router.get('/login', (req, res, next) => {
   res.set('Cache-Control', 'no-store'); //no cache stored in browser
-  if(req.session.Loggedin){
+  if (req.session.Loggedin) {
     res.redirect('/');
-  }else{
-      res.render('user/login',{loginErr:req.session.loginErr})
+  } else {
+    res.render('user/login', { loginErr: req.session.loginErr })
   }
 
 })
@@ -33,7 +41,7 @@ router.post('/login', (req, res) => {
     }
   })
 })
-router.get('/logout',(req,res,next)=>{
+router.get('/logout', (req, res, next) => {
   req.session.destroy();
   res.redirect('/')
 })
@@ -48,7 +56,7 @@ router.post('/signup', (req, res, next) => {
   res.redirect('/');
 })
 
-router.get('/cart',(req,res,next)=>{
+router.get('/cart', verifyLogin, (req, res, next) => {
   res.render('user/cart.hbs')
 })
 
