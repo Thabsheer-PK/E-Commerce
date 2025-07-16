@@ -10,6 +10,7 @@ var adminRouter = require('./routes/admin');
 var exphbs = require('express-handlebars')
 var fileUpload = require('express-fileupload')
 const session = require('express-session')
+const MongoStore = require('connect-mongo'); //session store in DB even nodemon restart
 
 var app = express();
 
@@ -18,13 +19,13 @@ connectDB();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
-app.engine('hbs',exphbs.engine({
+app.engine('hbs', exphbs.engine({
   extname: 'hbs',
   defaultLayout: 'layout',
-  layoutsDir: __dirname+'/views/layout',
-  partialsDir: __dirname+'/views/partials',
+  layoutsDir: __dirname + '/views/layout',
+  partialsDir: __dirname + '/views/partials',
   helpers: {
-    inc: function(value){
+    inc: function (value) {
       return parseInt(value) + 1;
     }
   }
@@ -35,18 +36,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload())
-app.use(session({secret:'Key', cookie:{maxAge:24 * 60 * 60 * 1000 }}))// cookie expired in 1 day
+app.use(session({
+  secret: 'Key',
+  resave: false,
+  store: MongoStore.create({      //session store in DB even nodemon restart
+    mongoUrl: 'mongodb://localhost:27017/', 
+    collectionName: 'sessions'
+  }),
+  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+
+}))// cookie expired in 1 day
 
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
