@@ -1,6 +1,6 @@
 const { getDB } = require('../config/connect')
 const collection = require('../config/collections')
-const { ObjectId } = require('mongodb')
+const { ObjectId } = require('mongodb');
 
 module.exports = {
   addProduct: async (product) => {
@@ -44,7 +44,7 @@ module.exports = {
           Price: productDetails.Price
 
         }
-      }).then((response)=>{
+      }).then((response) => {
         resolve(response);
       })
     })

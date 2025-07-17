@@ -1,7 +1,8 @@
 var express = require('express');
-const productHelpers = require('../helpers/product-helpers');
-const userHelpers = require('../helpers/user-helpers')
+const userHelpers = require('../helpers/user-helpers');
+const adminHelpers = require('../helpers/admin-helpers');
 var router = express.Router();
+
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
   if (req.session.Loggedin) {
     next();
@@ -14,7 +15,7 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
 /* GET home page. */
 router.get('/', function (req, res, next) {
   let user = req.session.user;
-  productHelpers.getAllProducts().then((products) => {
+  adminHelpers.getAllProducts().then((products) => {
     res.render('user/view-products', { admin: false, products, user })
   })
 });
@@ -64,7 +65,20 @@ router.post('/signup', (req, res, next) => {
 })
 
 router.get('/cart', verifyLogin, (req, res, next) => {
-  res.render('user/cart.hbs')
+  userHelpers.getCartProducts(req.session.user._id).then((data)=>{
+    console.log(data);
+    res.render('user/cart')
+  })
+  
+})
+
+router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
+  let productID = req.params.id;
+  let userID = req.session.user._id;
+  userHelpers.addToCart(productID,userID).then((response)=>{
+    console.log(response);
+    res.redirect('/')
+  })
 })
 
 module.exports = router;
