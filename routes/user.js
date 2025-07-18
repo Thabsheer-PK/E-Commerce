@@ -48,12 +48,12 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/signup', (req, res, next) => {
   res.set('Cache-Control', 'no-store'); //no cache stored in browser
-  if(req.session.Loggedin){
+  if (req.session.Loggedin) {
     res.redirect('/')
-  }else{
+  } else {
     res.render('user/signup')
   }
-  
+
 })
 router.post('/signup', (req, res, next) => {
   userHelpers.doSignup(req.body).then((user) => {
@@ -61,21 +61,27 @@ router.post('/signup', (req, res, next) => {
     req.session.user = user;
     res.redirect('/');
   })
-  
+
 })
 
 router.get('/cart', verifyLogin, (req, res, next) => {
-  userHelpers.getCartProducts(req.session.user._id).then((data)=>{
-    console.log(data);
-    res.render('user/cart')
+  userHelpers.getCartProducts(req.session.user._id).then((cart) => {
+    console.log(cart);
+    if (cart.length === 0) {
+      res.render('user/cart')
+    } else {
+      console.log(cart[0].cartItems);
+      res.render('user/cart', { cartItems: cart[0].cartItems, user: req.session.user })
+    }
+
   })
-  
+
 })
 
-router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
+router.get('/add-to-cart/:id', verifyLogin, (req, res) => {
   let productID = req.params.id;
   let userID = req.session.user._id;
-  userHelpers.addToCart(productID,userID).then((response)=>{
+  userHelpers.addToCart(productID, userID).then((response) => {
     console.log(response);
     res.redirect('/')
   })
