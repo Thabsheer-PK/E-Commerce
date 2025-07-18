@@ -102,6 +102,14 @@ module.exports = {
       }
     })
 
+  },
+  getCartQuantity: async (userId) => {
+    let quantity = 0;
+    let cart = await getDB().collection(collection.CART_COLLECTION).findOne({ user: new ObjectId(userId) })
+    if(cart){
+      quantity = cart.products.length
+    }
+    return quantity;
 
   }
 }

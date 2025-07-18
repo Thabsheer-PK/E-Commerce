@@ -13,10 +13,15 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
 }
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', async function (req, res, next) {
   let user = req.session.user;
+  let cartQty = null ;
+  if(user){
+     cartQty = await userHelpers.getCartQuantity(req.session.user._id);
+  }
+  
   adminHelpers.getAllProducts().then((products) => {
-    res.render('user/view-products', { admin: false, products, user })
+    res.render('user/view-products', { admin: false, products, user,cartQty })
   })
 });
 
@@ -64,16 +69,14 @@ router.post('/signup', (req, res, next) => {
 
 })
 
-router.get('/cart', verifyLogin, (req, res, next) => {
+router.get('/cart', verifyLogin, async (req, res, next) => {
   userHelpers.getCartProducts(req.session.user._id).then((cart) => {
-    console.log(cart);
     if (cart.length === 0) {
-      res.render('user/cart', {user: req.session.user})
+      res.render('user/cart', { user: req.session.user})
     } else {
-      console.log(cart[0].cartItems);
+
       res.render('user/cart', { cartItems: cart[0].cartItems, user: req.session.user })
     }
-
   })
 
 })

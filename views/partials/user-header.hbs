@@ -16,8 +16,14 @@
           <a class="nav-link" href="#">Orders</a>
         </li>
         {{/if}}
-        <li class="nav-item">
-          <a class="nav-link" href="/cart">Cart</a>
+        <li class="nav-item" style="position: relative;">
+          <a class="nav-link" href="/cart">Cart
+            {{#if cartQty}}
+            <span class="badge bg-success rounded-circle d-inline" style="position: absolute; top:
+          -0.3px;">{{cartQty}}
+            </span>
+            {{/if}}
+          </a>
         </li>
 
       </ul>
@@ -26,19 +32,19 @@
           aria-haspopup="true" aria-expanded="false">
           {{#if user}}
           <i class="bi bi-person"></i>
-            {{user.Name}}
-            {{else}}
-            <i class="bi bi-person"></i>
+          {{user.Name}}
+          {{else}}
+          <i class="bi bi-person"></i>
           {{/if}}
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           {{#if user}}
-            <a class="dropdown-item" href="/logout">Logout</a>
-            {{else}}
-              <a class="dropdown-item" href="/login">Login</a>
-              <a class="dropdown-item" href="/signup">Signup</a>
-          {{/if}} 
-          
+          <a class="dropdown-item" href="/logout">Logout</a>
+          {{else}}
+          <a class="dropdown-item" href="/login">Login</a>
+          <a class="dropdown-item" href="/signup">Signup</a>
+          {{/if}}
+
         </div>
       </div>
 
