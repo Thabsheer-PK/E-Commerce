@@ -1,70 +1,109 @@
 <section class="cart-section mt-5">
-  <div class="container">
-    <h2 class="mb-4">Your Cart</h2>
+  <div class="container-fluid">
+    <h2 class="mb-4">{{user.Name}}'s Cart</h2>
 
-    {{#if cartItems}}
-    <div class="table-responsive">
-      <table class="table table-bordered text-center">
-        <thead class="table-dark align-middle">
-          <tr class="align-middle">
-            <th class="align-middle">#</th>
-            <th class="align-middle">Image</th>
-            <th class="align-middle">Name</th>
-            <th class="align-middle">Description</th>
-            <th class="align-middle">Price (₹)</th>
-            <th class="align-middle">Quantity</th>
-            <th class="align-middle">Total (₹)</th>
-            <th class="align-middle">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each cartItems}}
-          <tr>
-            <td class="align-middle">{{inc @index}}</td>
-            <td>
-              <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" width="80">
-            </td>
-            <td class="align-middle">{{this.Name}}</td>
-            <td class="align-middle">{{this.Description}}</td>
-            <td class="align-middle">{{this.Price}}</td>
-            <td class="align-middle">
-              <div class="d-flex justify-content-center align-items-center">
-                <button class="btn btn-sm btn-outline-danger mr-3">-</button>
+    {{!-- 1st div, block to display all screen, it disply on md and above --}}
+
+    <div class="d-none d-md-block">
+      {{#if cartItems}}
+      <div class="table-responsive">
+        <table class="table table-bordered text-center">
+          <thead class="table-dark align-middle">
+            <tr class="align-middle">
+              <th class="align-middle">#</th>
+              <th class="align-middle">Image</th>
+              <th class="align-middle">Name</th>
+              <th class="align-middle">Description</th>
+              <th class="align-middle">Price (₹)</th>
+              <th class="align-middle">Quantity</th>
+              <th class="align-middle">Total (₹)</th>
+              <th class="align-middle">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each cartItems}}
+            <tr>
+              <td class="align-middle">{{inc @index}}</td>
+              <td>
+                <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" width="80">
+              </td>
+              <td class="align-middle">{{this.Name}}</td>
+              <td class="align-middle">{{this.Description}}</td>
+              <td class="align-middle">{{this.Price}}</td>
+              <td class="align-middle">
+                <div class="d-flex justify-content-center align-items-center">
+                  <button class="btn btn-sm btn-outline-danger mr-3">-</button>
+                  <span>1</span>
+                  {{!-- <span>{{this.quantity}}</span> --}}
+                  <button class="btn btn-sm btn-outline-primary ml-3">+</button>
+
+
+                </div>
+              </td>
+              {{!-- <td>{{multiply this.Price this.quantity}}</td> --}}
+              <td class="align-middle">TotalPrice</td>
+              <td class="align-middle">
+                <div class="d-flex" style="justify-content: center;">
+                  <a href="#" class="btn btn-danger mr-1">Remove</a>
+                  <a href="#" class="btn btn-success ml-1">Order</a>
+                </div>
+              </td>
+
+            </tr>
+            {{/each}}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th style="text-align: right;" colspan="6">Total:</th>
+              <th style="text-align: start;" colspan="2">₹{{total}}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="mt-2" style="text-align: end;" >
+        <a href="/checkout" class="btn btn-success">Order All</a>
+      </div>
+      {{else}}
+      <div class="alert alert-info text-center">
+        Your cart is empty. <a href="/">Start Shopping</a>
+      </div>
+      {{/if}}
+
+    </div>
+
+
+    <div class="d-block d-md-none">
+      {{#each cartItems}}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex gap-3">
+            <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}"  class="img-fluid ">
+            <div>
+              <h5 class="card-title">{{this.Name}}</h5>
+              <p class="card-text">{{this.Description}}</p>
+              <p class="mb-1">Price: ₹{{this.Price}}</p>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <button class="btn btn-sm btn-outline-danger mr-2">-</button>
                 <span>1</span>
-                {{!-- <span>{{this.quantity}}</span> --}}
-                <button class="btn btn-sm btn-outline-primary ml-3">+</button>
-
-
+                <button class="btn btn-sm btn-outline-primary ml-2">+</button>
               </div>
-            </td>
-            {{!-- <td>{{multiply this.Price this.quantity}}</td> --}}
-            <td class="align-middle">TotalPrice</td>
-            <td class="align-middle">
-              <div class="d-flex ">
+              <p>Total: ₹TotalPrice</p>
+              <div class="d-flex gap-2">
                 <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
               </div>
-            </td>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
 
-          </tr>
-          {{/each}}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th style="text-align: right;" colspan="6">Total:</th>
-            <th style="text-align: start;" colspan="2">₹{{total}}</th>
-          </tr>
-        </tfoot>
-      </table>
+      <div style="text-align: end;">
+        <h5>Total: ₹20000{{total}}</h5>
+        <a href="/checkout" class="btn btn-success">Order All</a>
+      </div>
     </div>
 
-    <div class="text-end mt-3">
-      <a href="/checkout" class="btn btn-success">Proceed to Checkout</a>
-    </div>
-    {{else}}
-    <div class="alert alert-info text-center">
-      Your cart is empty. <a href="/">Start Shopping</a>
-    </div>
-    {{/if}}
   </div>
 </section>

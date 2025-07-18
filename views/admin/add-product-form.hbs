@@ -24,6 +24,9 @@
             <label for="inputForimage">Upload Product Image</label>
             <input id="inputForimage" type="file" required class="form-control" name='Image'>
           </div>
+          <div>
+            <img src="" id="viewImage" style="width: 100px;" alt="">
+          </div>
 
           <button type="submit" class="btn btn-success mt-2">Submit</button>
 
@@ -32,3 +35,16 @@
     </div>
   </div>
 </section>
+
+<script>
+  document.getElementById('inputForimage').addEventListener('change',(event)=>{
+    const file = event.target.files[0];
+    if(file){
+      const image = document.getElementById('viewImage');
+      image.src = URL.createObjectURL(file);
+      image.onload = ()=>{
+        URL.revokeObjectURL(image.src) // // this remove temperory object url after image change
+      }
+    }
+  })
+</script>

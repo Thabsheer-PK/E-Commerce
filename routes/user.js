@@ -68,7 +68,7 @@ router.get('/cart', verifyLogin, (req, res, next) => {
   userHelpers.getCartProducts(req.session.user._id).then((cart) => {
     console.log(cart);
     if (cart.length === 0) {
-      res.render('user/cart')
+      res.render('user/cart', {user: req.session.user})
     } else {
       console.log(cart[0].cartItems);
       res.render('user/cart', { cartItems: cart[0].cartItems, user: req.session.user })
