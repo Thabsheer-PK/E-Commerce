@@ -5,7 +5,7 @@
     {{!-- 1st div, block to display all screen, it disply on md and above --}}
 
     <div class="d-none d-md-block">
-      {{#if cartItems}}
+      {{#if products}}
       <div class="table-responsive">
         <table class="table table-bordered text-center">
           <thead class="table-dark align-middle">
@@ -21,8 +21,10 @@
             </tr>
           </thead>
           <tbody>
-            {{#each cartItems}}
+            {{#each products}}
+
             <tr>
+              {{#each this.product}}
               <td class="align-middle">{{inc @index}}</td>
               <td>
                 <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" width="80">
@@ -30,11 +32,11 @@
               <td class="align-middle">{{this.Name}}</td>
               <td class="align-middle">{{this.Description}}</td>
               <td class="align-middle">{{this.Price}}</td>
+              {{/each}}
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
                   <button class="btn btn-sm btn-outline-danger mr-3">-</button>
-                  <span>1</span>
-                  {{!-- <span>{{this.quantity}}</span> --}}
+                  <span>{{this.quantity}}</span>
                   <button class="btn btn-sm btn-outline-primary ml-3">+</button>
 
 
@@ -61,7 +63,7 @@
         </table>
       </div>
 
-      <div class="mt-2" style="text-align: end;" >
+      <div class="mt-2" style="text-align: end;">
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
       {{else}}
@@ -72,20 +74,23 @@
 
     </div>
 
-
+    {{!-- when under medium devices --}}
     <div class="d-block d-md-none">
-      {{#each cartItems}}
+      {{#if products}}
+      {{#each products}}
       <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex gap-3">
-            <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}"  class="img-fluid ">
+            {{#each this.product}}
+            <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" class="img-fluid ">
             <div>
               <h5 class="card-title">{{this.Name}}</h5>
               <p class="card-text">{{this.Description}}</p>
               <p class="mb-1">Price: ₹{{this.Price}}</p>
+              {{/each}}
               <div class="d-flex align-items-center gap-2 mb-2">
                 <button class="btn btn-sm btn-outline-danger mr-2">-</button>
-                <span>1</span>
+                <span>{{this.quantity}}</span>
                 <button class="btn btn-sm btn-outline-primary ml-2">+</button>
               </div>
               <p>Total: ₹TotalPrice</p>
@@ -98,11 +103,16 @@
         </div>
       </div>
       {{/each}}
-
       <div style="text-align: end;">
         <h5>Total: ₹20000{{total}}</h5>
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
+
+      {{else}}
+      <div class="alert alert-info text-center">
+        Your cart is empty. <a href="/">Start Shopping</a>
+      </div>
+      {{/if}}
     </div>
 
   </div>

@@ -70,12 +70,12 @@ router.post('/signup', (req, res, next) => {
 })
 
 router.get('/cart', verifyLogin, async (req, res, next) => {
-  userHelpers.getCartProducts(req.session.user._id).then((cart) => {
-    if (cart.length === 0) {
+  userHelpers.getCartProducts(req.session.user._id).then((products) => {
+    console.log(products);
+    if (products.length === 0) {
       res.render('user/cart', { user: req.session.user})
     } else {
-
-      res.render('user/cart', { cartItems: cart[0].cartItems, user: req.session.user })
+      res.render('user/cart', { products, user: req.session.user })
     }
   })
 
