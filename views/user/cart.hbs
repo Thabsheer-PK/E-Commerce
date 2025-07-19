@@ -32,18 +32,19 @@
               <td class="align-middle">{{this.Name}}</td>
               <td class="align-middle">{{this.Description}}</td>
               <td class="align-middle">{{this.Price}}</td>
-              {{/each}}
+              
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
                   <button class="btn btn-sm btn-outline-danger mr-3">-</button>
-                  <span>{{this.quantity}}</span>
+                  <span>{{../quantity}}</span>
                   <button class="btn btn-sm btn-outline-primary ml-3">+</button>
 
 
                 </div>
               </td>
-              {{!-- <td>{{multiply this.Price this.quantity}}</td> --}}
-              <td class="align-middle">TotalPrice</td>
+              {{!-- ../ take outer of current loop(or outer of current array) field, --}}
+              <td class="align-middle">{{multiply ../quantity this.Price}}</td>
+              {{/each}}
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
                   <a href="#" class="btn btn-danger mr-1">Remove</a>
@@ -87,13 +88,14 @@
               <h5 class="card-title">{{this.Name}}</h5>
               <p class="card-text">{{this.Description}}</p>
               <p class="mb-1">Price: ₹{{this.Price}}</p>
-              {{/each}}
+
               <div class="d-flex align-items-center gap-2 mb-2">
                 <button class="btn btn-sm btn-outline-danger mr-2">-</button>
-                <span>{{this.quantity}}</span>
+                <span>{{../quantity}}</span>   {{!-- ../ used the outer loop or outer product array , quantity field --}}
                 <button class="btn btn-sm btn-outline-primary ml-2">+</button>
               </div>
-              <p>Total: ₹TotalPrice</p>
+              <p>Total: ₹{{multiply ../quantity this.Price}}</p>
+              {{/each}}
               <div class="d-flex gap-2">
                 <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>

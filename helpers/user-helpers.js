@@ -94,17 +94,17 @@ module.exports = {
           },
           {
             $unwind: "$products"
-          },{
-            $project:{
-              item:'$products.item',
+          }, {
+            $project: {
+              item: '$products.item',
               quantity: '$products.quantity'
             }
-          },{
-            $lookup:{
+          }, {
+            $lookup: {
               from: collection.PRODUCT_COLLECTION,
               localField: 'item',
               foreignField: '_id',
-              as : 'product'
+              as: 'product'
             }
           }
 
@@ -122,8 +122,25 @@ module.exports = {
     let quantity = 0;
     let cart = await getDB().collection(collection.CART_COLLECTION).findOne({ user: new ObjectId(userId) })
     if (cart) {
-      quantity = cart.products.length
+     let result = await getDB().collection(collection.CART_COLLECTION).aggregate([
+        {
+          $match: {
+            user: new ObjectId(userId)
+          }
+        }, {
+          $project: {
+            totalQty: {
+              $sum: "$products.quantity"
+            }
+          }
+        }
+      ]).toArray();
+
+      if(result.length >=0 ){
+         quantity = result[0].totalQty;
+      }
     }
+    
     return quantity;
 
   }

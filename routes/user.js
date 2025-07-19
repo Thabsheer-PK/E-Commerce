@@ -71,7 +71,7 @@ router.post('/signup', (req, res, next) => {
 
 router.get('/cart', verifyLogin, async (req, res, next) => {
   userHelpers.getCartProducts(req.session.user._id).then((products) => {
-    console.log(products);
+    multiply(products.quantity,)
     if (products.length === 0) {
       res.render('user/cart', { user: req.session.user})
     } else {

@@ -27,6 +27,9 @@ app.engine('hbs', exphbs.engine({
   helpers: {
     inc: function (value) {
       return parseInt(value) + 1;
+    },
+    multiply: function (a,b){
+      return parseFloat(a)*parseFloat(b);
     }
   }
 }))
