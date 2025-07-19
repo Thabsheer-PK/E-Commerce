@@ -30,7 +30,7 @@
               </td>
               <td class="align-middle">{{this.product.Name}}</td>
               <td class="align-middle">{{this.product.Description}}</td>
-              <td class="align-middle">{{this.product.Price}}</td>
+              <td class="align-middle">{{priceFormat this.product.Price}}</td>
               
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
@@ -41,7 +41,7 @@
 
                 </div>
               </td>
-              <td class="align-middle">{{multiply this.quantity this.product.Price}}</td>
+              <td class="align-middle">{{multiplyAndFormat this.quantity this.product.Price}}</td>
               
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
@@ -56,7 +56,7 @@
           <tfoot>
             <tr>
               <th style="text-align: right;" colspan="6">Total:</th>
-              <th style="text-align: start;" colspan="2">₹ {{totalCartPrice}}</th>
+              <th style="text-align: start;" colspan="2">₹ {{priceFormat totalCartPrice}}</th>
             </tr>
           </tfoot>
         </table>
@@ -84,14 +84,14 @@
             <div>
               <h5 class="card-title">{{this.product.Name}}</h5>
               <p class="card-text">{{this.product.Description}}</p>
-              <p class="mb-1">Price: ₹{{this.product.Price}}</p>
+              <p class="mb-1">Price: ₹{{priceFormat this.product.Price}}</p>
 
               <div class="d-flex align-items-center gap-2 mb-2">
                 <button class="btn btn-sm btn-outline-danger mr-2">-</button>
                 <span>{{this.quantity}}</span>   
                 <button class="btn btn-sm btn-outline-primary ml-2">+</button>
               </div>
-              <p>Total: ₹{{multiply this.quantity this.product.Price}}</p>
+              <p>Total: ₹{{multiplyAndFormat this.quantity this.product.Price}}</p>
               <div class="d-flex gap-2">
                 <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
@@ -102,7 +102,7 @@
       </div>
       {{/each}}
       <div style="text-align: end;">
-        <h5>Total: {{totalCartPrice}}</h5>
+        <h5>Total: {{priceFormat totalCartPrice}}</h5>
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
 

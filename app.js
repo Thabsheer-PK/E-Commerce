@@ -28,11 +28,19 @@ app.engine('hbs', exphbs.engine({
     inc: function (value) {
       return parseInt(value) + 1;
     },
-    multiply: function (a,b){
-      return parseFloat(a)*parseFloat(b);
+    multiply: function (a, b) {
+      return parseFloat(a) * parseFloat(b);
+    },
+    priceFormat: (price) => {
+      return price.toLocaleString('en-IN') //indian format
+    },
+    multiplyAndFormat: (qty, price) => {
+      console.log('qty, price',typeof(qty),typeof(price));
+      let total = qty * price;
+      return Number(total).toLocaleString('en-IN');
     }
   }
-}))
+    }))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -43,7 +51,7 @@ app.use(session({
   secret: 'Key',
   resave: false,
   store: MongoStore.create({      //session store in DB even nodemon restart
-    mongoUrl: 'mongodb://localhost:27017/', 
+    mongoUrl: 'mongodb://localhost:27017/',
     collectionName: 'sessions'
   }),
   cookie: { maxAge: 24 * 60 * 60 * 1000 }
