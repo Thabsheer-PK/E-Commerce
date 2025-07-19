@@ -24,27 +24,25 @@
             {{#each products}}
 
             <tr>
-              {{#each this.product}}
               <td class="align-middle">{{inc @index}}</td>
               <td>
-                <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" width="80">
+                <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" width="80">
               </td>
-              <td class="align-middle">{{this.Name}}</td>
-              <td class="align-middle">{{this.Description}}</td>
-              <td class="align-middle">{{this.Price}}</td>
+              <td class="align-middle">{{this.product.Name}}</td>
+              <td class="align-middle">{{this.product.Description}}</td>
+              <td class="align-middle">{{this.product.Price}}</td>
               
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
                   <button class="btn btn-sm btn-outline-danger mr-3">-</button>
-                  <span>{{../quantity}}</span>
+                  <span>{{this.quantity}}</span>
                   <button class="btn btn-sm btn-outline-primary ml-3">+</button>
 
 
                 </div>
               </td>
-              {{!-- ../ take outer of current loop(or outer of current array) field, --}}
-              <td class="align-middle">{{multiply ../quantity this.Price}}</td>
-              {{/each}}
+              <td class="align-middle">{{multiply this.quantity this.product.Price}}</td>
+              
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
                   <a href="#" class="btn btn-danger mr-1">Remove</a>
@@ -58,7 +56,7 @@
           <tfoot>
             <tr>
               <th style="text-align: right;" colspan="6">Total:</th>
-              <th style="text-align: start;" colspan="2">₹{{total}}</th>
+              <th style="text-align: start;" colspan="2">₹ {{totalCartPrice}}</th>
             </tr>
           </tfoot>
         </table>
@@ -82,20 +80,18 @@
       <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex gap-3">
-            {{#each this.product}}
-            <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" class="img-fluid ">
+            <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" class="img-fluid ">
             <div>
-              <h5 class="card-title">{{this.Name}}</h5>
-              <p class="card-text">{{this.Description}}</p>
-              <p class="mb-1">Price: ₹{{this.Price}}</p>
+              <h5 class="card-title">{{this.product.Name}}</h5>
+              <p class="card-text">{{this.product.Description}}</p>
+              <p class="mb-1">Price: ₹{{this.product.Price}}</p>
 
               <div class="d-flex align-items-center gap-2 mb-2">
                 <button class="btn btn-sm btn-outline-danger mr-2">-</button>
-                <span>{{../quantity}}</span>   {{!-- ../ used the outer loop or outer product array , quantity field --}}
+                <span>{{this.quantity}}</span>   
                 <button class="btn btn-sm btn-outline-primary ml-2">+</button>
               </div>
-              <p>Total: ₹{{multiply ../quantity this.Price}}</p>
-              {{/each}}
+              <p>Total: ₹{{multiply this.quantity this.product.Price}}</p>
               <div class="d-flex gap-2">
                 <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
@@ -106,7 +102,7 @@
       </div>
       {{/each}}
       <div style="text-align: end;">
-        <h5>Total: ₹20000{{total}}</h5>
+        <h5>Total: {{totalCartPrice}}</h5>
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
 

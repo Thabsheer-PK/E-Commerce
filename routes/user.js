@@ -1,6 +1,8 @@
 var express = require('express');
 const userHelpers = require('../helpers/user-helpers');
 const adminHelpers = require('../helpers/admin-helpers');
+const { getDB } = require('../config/connect');
+const collections = require('../config/collections');
 var router = express.Router();
 
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
@@ -15,13 +17,13 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   let user = req.session.user;
-  let cartQty = null ;
-  if(user){
-     cartQty = await userHelpers.getCartQuantity(req.session.user._id);
+  let cartQty = null;
+  if (user) {
+    cartQty = await userHelpers.getCartQuantity(req.session.user._id);
   }
-  
+
   adminHelpers.getAllProducts().then((products) => {
-    res.render('user/view-products', { admin: false, products, user,cartQty })
+    res.render('user/view-products', { admin: false, products, user, cartQty })
   })
 });
 
@@ -71,11 +73,15 @@ router.post('/signup', (req, res, next) => {
 
 router.get('/cart', verifyLogin, async (req, res, next) => {
   userHelpers.getCartProducts(req.session.user._id).then((products) => {
-    multiply(products.quantity,)
+    let totalCartPrice = 0;
+    products.forEach((item) => {
+      totalCartPrice += item.totalPrice
+    })
+    console.log(products);
     if (products.length === 0) {
-      res.render('user/cart', { user: req.session.user})
+      res.render('user/cart', { user: req.session.user })
     } else {
-      res.render('user/cart', { products, user: req.session.user })
+      res.render('user/cart', { products, user: req.session.user, totalCartPrice })
     }
   })
 
@@ -86,7 +92,7 @@ router.get('/add-to-cart/:id', (req, res) => {
   let userID = req.session.user._id;
   console.log('api called');
   userHelpers.addToCart(productID, userID).then((response) => {
-    res.json({status:true})
+    res.json({ status: true })
   })
 })
 

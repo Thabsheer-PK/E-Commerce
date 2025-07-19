@@ -45,7 +45,7 @@ module.exports = {
 
       let productObj = {
         item: new ObjectId(productID),
-        quantity: 1
+        quantity: 1,
       }
 
       try {
@@ -59,6 +59,7 @@ module.exports = {
               }
 
             )
+
             resolve()
           } else {
             await getDB().collection(collection.CART_COLLECTION).updateOne({ user: new ObjectId(userID) }, {
@@ -66,6 +67,7 @@ module.exports = {
                 products: productObj
               }
             })
+
             resolve()
           }
         } else {
@@ -94,22 +96,38 @@ module.exports = {
           },
           {
             $unwind: "$products"
-          }, {
-            $project: {
+          }, 
+          {
+            $project :{
               item: '$products.item',
               quantity: '$products.quantity'
             }
-          }, {
+          },          
+          {
             $lookup: {
               from: collection.PRODUCT_COLLECTION,
               localField: 'item',
               foreignField: '_id',
               as: 'product'
             }
+          }, {
+            $unwind: '$product'
+          }, {
+            $project: {
+              item: 1,
+              quantity: 1,
+              product: 1,
+              totalPrice: {
+                $multiply: ['$quantity',{$toDouble:"$product.Price"}]
+              }
+            }
           }
 
 
         ]).toArray();
+        cartItems.forEach((item)=>{
+          item.product.Price = Number(item.product.Price)
+        })
         resolve(cartItems)
 
       } catch (error) {
@@ -122,7 +140,7 @@ module.exports = {
     let quantity = 0;
     let cart = await getDB().collection(collection.CART_COLLECTION).findOne({ user: new ObjectId(userId) })
     if (cart) {
-     let result = await getDB().collection(collection.CART_COLLECTION).aggregate([
+      let result = await getDB().collection(collection.CART_COLLECTION).aggregate([
         {
           $match: {
             user: new ObjectId(userId)
@@ -136,11 +154,11 @@ module.exports = {
         }
       ]).toArray();
 
-      if(result.length >=0 ){
-         quantity = result[0].totalQty;
+      if (result.length >= 0) {
+        quantity = result[0].totalQty;
       }
     }
-    
+
     return quantity;
 
   }
