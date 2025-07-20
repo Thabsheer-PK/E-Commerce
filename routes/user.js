@@ -92,7 +92,7 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 
   userHelpers.getCartProducts(req.session.user._id).then((products) => {
     if (products.length === 0) {
-      res.render('user/cart', { user: req.session.user })
+      res.render('user/cart', { user: req.session.user,cartQty })
     } else {
       res.render('user/cart', { products, user: req.session.user, totalCartPrice, cartQty })
     }
@@ -100,10 +100,10 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 
 })
 
-router.get('/add-to-cart/:id', (req, res) => {
-  let productID = req.params.id;
+router.post('/add-to-cart', (req, res,next) => {
   let userID = req.session.user._id;
-  userHelpers.addToCart(productID, userID).then((response) => {
+  const {productID} = req.body; 
+  userHelpers.addToCart(productID, userID).then(() => {
     res.json({ status: true })
   })
 })
@@ -113,4 +113,13 @@ router.post('/change-count-qty', (req, res, next) => {
     res.json({ status: true })
   })
 })
+
+router.post('/remove-from-cart',(req,res,next)=>{
+  userHelpers.removeFromCart(req.body).then(()=>{
+    res.json({status:true})
+  })
+})
+
+
+
 module.exports = router;

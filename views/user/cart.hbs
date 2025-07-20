@@ -23,7 +23,7 @@
           <tbody>
             {{#each products}}
 
-            <tr>
+            <tr class="cart-item" data-product-id="{{this.product._id}}">
               <td class="align-middle">{{inc @index}}</td>
               <td>
                 <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" width="80">
@@ -44,8 +44,8 @@
               
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
-                  <a href="#" class="btn btn-danger mr-1">Remove</a>
-                  <a href="#" class="btn btn-success ml-1">Order</a>
+                  <button class="btn btn-danger mr-1" onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</button>
+                  <button class="btn btn-success ml-1">Order</button>
                 </div>
               </td>
 
@@ -78,7 +78,7 @@
       {{#each products}}
       <div class="card mb-3">
         <div class="card-body">
-          <div class="d-flex gap-3">
+          <div class="d-flex gap-3 cart-item"data-product-id="{{this.product._id}}">
             <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" class="img-fluid ">
             <div>
               <h5 class="card-title">{{this.product.Name}}</h5>
@@ -93,7 +93,7 @@
               </div>
               <p class="product-total" data-product-id="{{this.product._id}}">Total: ₹{{multiplyAndFormat this.quantity this.product.Price}}</p>
               <div class="d-flex gap-2">
-                <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
+                <a href="#" class="btn btn-sm btn-danger mr-1" onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
               </div>
             </div>
@@ -105,9 +105,8 @@
         <h5 class="total-cart-price" >Total: {{priceFormat totalCartPrice}}</h5>
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
-
       {{else}}
-      <div class="alert alert-info text-center">
+      <div class="alert alert-info text-center empty-cart">
         Your cart is empty. <a href="/">Start Shopping</a>
       </div>
       {{/if}}
