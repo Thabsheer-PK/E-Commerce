@@ -19,13 +19,22 @@ function addToCartBtnAjax(productID) {
       if (response.status) {
         let count = parseInt($(`#cart-count-header`).text()) || 0;
         $(`#cart-count-header`).text(count + 1)
-        
+
       }
     }
   })
 }
 
 function changeProductQty(cartId, productId, count) {
+  let isMobile = window.innerWidth < 768;
+  let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
+  let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`)
+  let currentQty = parseInt(qtySpan.text())
+  if (currentQty <= 1 && count == -1) {
+    removeFromCart(cartId,productId);
+    return;
+  }
+
   $.ajax({
     url: '/change-count-qty',
     data: {
@@ -36,39 +45,30 @@ function changeProductQty(cartId, productId, count) {
     method: 'post',
     success: (response) => {
       if (response.status) {
-        let isMobile = window.innerWidth < 768;
-        let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
 
         // quantity changing
-        let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`)
-        let currentQty = parseInt(qtySpan.text())
         let newQty = currentQty + count;
-        if (newQty < 0) {
-          removeFromCart(productId);
-          return;
-        } else {
-          qtySpan.text(newQty);
+        qtySpan.text(newQty);
+        let cartHeaderQty = parseInt($(`#cart-count-header`).text());
+        cartHeaderQty = cartHeaderQty + (count);
+        $(`#cart-count-header`).text(cartHeaderQty);
 
-          let cartHeaderQty = parseInt($(`#cart-count-header`).text());
-          cartHeaderQty = cartHeaderQty + (count);
-          $(`#cart-count-header`).text(cartHeaderQty);
+        //product price total
+        let priceText = $(`${layoutContainer} .product-price[data-product-id="${productId}"]`).text()
+        let pricePerUnit = extraNumericValue(priceText);
+        let newTotal = pricePerUnit * newQty;
+        let formattedTotal = formatINR(newTotal);
+        let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`)
+        productTotal.text(formattedTotal)
 
-          //product price total
-          let priceText = $(`${layoutContainer} .product-price[data-product-id="${productId}"]`).text()
-          let pricePerUnit = extraNumericValue(priceText);
-          let newTotal = pricePerUnit * newQty;
-          let formattedTotal = formatINR(newTotal);
-          let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`)
-          productTotal.text(formattedTotal)
+        // total cart price
+        let totalCartPriceText = $(`${layoutContainer} .total-cart-price`);
+        let cartPriceInUnit = extraNumericValue(totalCartPriceText.text());
 
-          // total cart price
-          let totalCartPriceText = $(`${layoutContainer} .total-cart-price`);
-          let cartPriceInUnit = extraNumericValue(totalCartPriceText.text());
+        let cartTotalPrice = cartPriceInUnit + (pricePerUnit * count);
+        let formatCartTotal = formatINR(cartTotalPrice);
+        totalCartPriceText.text(formatCartTotal);
 
-          let cartTotalPrice = cartPriceInUnit + (pricePerUnit * count);
-          let formatCartTotal = formatINR(cartTotalPrice);
-          totalCartPriceText.text(formatCartTotal);
-        }
 
 
       }
