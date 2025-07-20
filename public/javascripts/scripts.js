@@ -31,8 +31,8 @@ function changeProductQty(cartId, productId, count) {
   let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`)
   let currentQty = parseInt(qtySpan.text())
   if (currentQty <= 1 && count == -1) {
-    removeFromCart(cartId,productId);
-    return;
+    removeFromCart(cartId, productId)
+
   }
 
   $.ajax({
@@ -77,52 +77,56 @@ function changeProductQty(cartId, productId, count) {
 }
 
 function removeFromCart(cartId, productId) {
-  $.ajax({
-    url: '/remove-from-cart',
-    data: {
-      cartId,
-      productId
-    },
-    method: 'post',
-    success: (response) => {
-      if (response.status) {
-        let isMobile = window.innerWidth < 768;
-        let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
+  if (confirm("Are you sure you want to remove this product from your cart?")) {
 
-        //for updating cart header count
-        let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`);
-        let currentQty = extraNumericValue(qtySpan.text());
-        let cartHeaderQty = parseInt($(`#cart-count-header`).text());
-        let newCartQty = cartHeaderQty - currentQty;
-        $('#cart-count-header').text(newCartQty);
 
-        //updating current cartTotal
-        let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`).text()
-        let productTotalUnit = extraNumericValue(productTotal);
+    $.ajax({
+      url: '/remove-from-cart',
+      data: {
+        cartId,
+        productId
+      },
+      method: 'post',
+      success: (response) => {
+        if (response.status) {
+          let isMobile = window.innerWidth < 768;
+          let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
 
-        let cartTotal = $(`${layoutContainer} .total-cart-price`).text();
-        let cartTotalUnit = extraNumericValue(cartTotal);
+          //for updating cart header count
+          let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`);
+          let currentQty = extraNumericValue(qtySpan.text());
+          let cartHeaderQty = parseInt($(`#cart-count-header`).text());
+          let newCartQty = cartHeaderQty - currentQty;
+          $('#cart-count-header').text(newCartQty);
 
-        let currentCartTotalPrice = cartTotalUnit - productTotalUnit;
-        let formattedCartTotal = formatINR(currentCartTotalPrice);
+          //updating current cartTotal
+          let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`).text()
+          let productTotalUnit = extraNumericValue(productTotal);
 
-        $('.total-cart-price').text(formattedCartTotal)
+          let cartTotal = $(`${layoutContainer} .total-cart-price`).text();
+          let cartTotalUnit = extraNumericValue(cartTotal);
 
-        //remove from cart when click
-        $(`${layoutContainer} .cart-item[data-product-id="${productId}"]`).remove()
+          let currentCartTotalPrice = cartTotalUnit - productTotalUnit;
+          let formattedCartTotal = formatINR(currentCartTotalPrice);
 
-        // Check if any cart items remain
-        if ($(`${layoutContainer} .cart-item`).length === 0) {
-          $(`${layoutContainer}`).html(`
+          $('.total-cart-price').text(formattedCartTotal)
+
+          //remove from cart when click
+          $(`${layoutContainer} .cart-item[data-product-id="${productId}"]`).remove()
+
+          // Check if any cart items remain
+          if ($(`${layoutContainer} .cart-item`).length === 0) {
+            $(`${layoutContainer}`).html(`
           <div class="alert alert-info text-center">
             Your cart is empty. <a href="/">Start Shopping</a>
           </div>
           `);
+          }
+
+
         }
 
-
       }
-
-    }
-  })
+    })
+  }
 }
