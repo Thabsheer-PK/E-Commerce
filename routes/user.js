@@ -13,6 +13,21 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
   }
 
 }
+async function getCartTotalPrice(userId) {
+  try {
+    const products = await userHelpers.getCartProducts(userId);
+    let totalCartPrice = 0;
+
+    products.forEach((item) => {
+      totalCartPrice += item.totalPrice;
+    });
+
+    return totalCartPrice;
+  } catch (err) {
+    console.error('Error calculating total price:', err);
+    return 0;
+  }
+}
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
@@ -72,16 +87,14 @@ router.post('/signup', (req, res, next) => {
 })
 
 router.get('/cart', verifyLogin, async (req, res, next) => {
+  let cartQty = await userHelpers.getCartQuantity(req.session.user._id);
+  let totalCartPrice = await getCartTotalPrice(req.session.user._id);
+
   userHelpers.getCartProducts(req.session.user._id).then((products) => {
-    let totalCartPrice = 0;
-    products.forEach((item) => {
-      totalCartPrice += item.totalPrice
-    })
-    console.log(products);
     if (products.length === 0) {
       res.render('user/cart', { user: req.session.user })
     } else {
-      res.render('user/cart', { products, user: req.session.user, totalCartPrice })
+      res.render('user/cart', { products, user: req.session.user, totalCartPrice, cartQty })
     }
   })
 
@@ -90,10 +103,14 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 router.get('/add-to-cart/:id', (req, res) => {
   let productID = req.params.id;
   let userID = req.session.user._id;
-  console.log('api called');
   userHelpers.addToCart(productID, userID).then((response) => {
     res.json({ status: true })
   })
 })
 
+router.post('/change-count-qty', (req, res, next) => {
+  userHelpers.changeProductQty(req.body).then(() => {
+    res.json({ status: true })
+  })
+})
 module.exports = router;

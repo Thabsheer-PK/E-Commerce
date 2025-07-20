@@ -96,13 +96,13 @@ module.exports = {
           },
           {
             $unwind: "$products"
-          }, 
+          },
           {
-            $project :{
+            $project: {
               item: '$products.item',
               quantity: '$products.quantity'
             }
-          },          
+          },
           {
             $lookup: {
               from: collection.PRODUCT_COLLECTION,
@@ -118,14 +118,14 @@ module.exports = {
               quantity: 1,
               product: 1,
               totalPrice: {
-                $multiply: ['$quantity',{$toDouble:"$product.Price"}]
+                $multiply: ['$quantity', { $toDouble: "$product.Price" }]
               }
             }
           }
 
 
         ]).toArray();
-        cartItems.forEach((item)=>{
+        cartItems.forEach((item) => {
           item.product.Price = Number(item.product.Price)
         })
         resolve(cartItems)
@@ -160,6 +160,21 @@ module.exports = {
     }
 
     return quantity;
+
+  },
+
+  changeProductQty: (details) => {
+    return new Promise((resolve, reject) => {
+      let cartId = details.cartId
+      let productId = details.productId
+      let count = parseInt(details.count)
+      getDB().collection(collection.CART_COLLECTION).updateOne({ _id: new ObjectId(cartId), 'products.item':new ObjectId(productId) }, {
+        $inc: {"products.$.quantity": count} // count 1 or -1, done properly
+      }).then((response) => {
+        resolve(response)
+      })
+
+    })
 
   }
 }

@@ -4,7 +4,7 @@
 
     {{!-- 1st div, block to display all screen, it disply on md and above --}}
 
-    <div class="d-none d-md-block">
+    <div class="d-none d-md-block desktop-cart">
       {{#if products}}
       <div class="table-responsive">
         <table class="table table-bordered text-center">
@@ -30,18 +30,17 @@
               </td>
               <td class="align-middle">{{this.product.Name}}</td>
               <td class="align-middle">{{this.product.Description}}</td>
-              <td class="align-middle">{{priceFormat this.product.Price}}</td>
+              <td class="align-middle product-price" data-product-id="{{this.product._id}}">₹ {{priceFormat this.product.Price}}</td>
               
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
-                  <button class="btn btn-sm btn-outline-danger mr-3">-</button>
-                  <span>{{this.quantity}}</span>
-                  <button class="btn btn-sm btn-outline-primary ml-3">+</button>
-
+                  <button class="btn btn-sm btn-outline-danger mr-3" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                  <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
+                  <button class="btn btn-sm btn-outline-primary ml-3" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
 
                 </div>
               </td>
-              <td class="align-middle">{{multiplyAndFormat this.quantity this.product.Price}}</td>
+              <td class="align-middle product-total" data-product-id="{{this.product._id}}">₹ {{multiplyAndFormat this.quantity this.product.Price}}</td>
               
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
@@ -56,7 +55,7 @@
           <tfoot>
             <tr>
               <th style="text-align: right;" colspan="6">Total:</th>
-              <th style="text-align: start;" colspan="2">₹ {{priceFormat totalCartPrice}}</th>
+              <th style="text-align: start;" colspan="2" class="total-cart-price">₹ {{priceFormat totalCartPrice}}</th>
             </tr>
           </tfoot>
         </table>
@@ -74,7 +73,7 @@
     </div>
 
     {{!-- when under medium devices --}}
-    <div class="d-block d-md-none">
+    <div class="d-block d-md-none mobile-cart">
       {{#if products}}
       {{#each products}}
       <div class="card mb-3">
@@ -84,14 +83,15 @@
             <div>
               <h5 class="card-title">{{this.product.Name}}</h5>
               <p class="card-text">{{this.product.Description}}</p>
-              <p class="mb-1">Price: ₹{{priceFormat this.product.Price}}</p>
+              <p class="mb-1">Price: ₹ <span class="product-price" data-product-id="{{this.product._id}}">{{this.product.Price}}</span></p>
 
               <div class="d-flex align-items-center gap-2 mb-2">
-                <button class="btn btn-sm btn-outline-danger mr-2">-</button>
-                <span>{{this.quantity}}</span>   
-                <button class="btn btn-sm btn-outline-primary ml-2">+</button>
+
+                <button class="btn btn-sm btn-outline-danger mr-2" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>   
+                <button class="btn btn-sm btn-outline-primary ml-2 " onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
               </div>
-              <p>Total: ₹{{multiplyAndFormat this.quantity this.product.Price}}</p>
+              <p class="product-total" data-product-id="{{this.product._id}}">Total: ₹{{multiplyAndFormat this.quantity this.product.Price}}</p>
               <div class="d-flex gap-2">
                 <a href="#" class="btn btn-sm btn-danger mr-1">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
@@ -102,7 +102,7 @@
       </div>
       {{/each}}
       <div style="text-align: end;">
-        <h5>Total: {{priceFormat totalCartPrice}}</h5>
+        <h5 class="total-cart-price" >Total: {{priceFormat totalCartPrice}}</h5>
         <a href="/checkout" class="btn btn-success">Order All</a>
       </div>
 

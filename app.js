@@ -35,7 +35,6 @@ app.engine('hbs', exphbs.engine({
       return price.toLocaleString('en-IN') //indian format
     },
     multiplyAndFormat: (qty, price) => {
-      console.log('qty, price',typeof(qty),typeof(price));
       let total = qty * price;
       return Number(total).toLocaleString('en-IN');
     }
