@@ -4,6 +4,7 @@ const adminHelpers = require('../helpers/admin-helpers');
 const { getDB } = require('../config/connect');
 const collections = require('../config/collections');
 var router = express.Router();
+const session = require('express-session');
 
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
   if (req.session.Loggedin) {
@@ -32,9 +33,11 @@ async function getCartTotalPrice(userId) {
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   let user = req.session.user;
-  let cartQty = null;
+  let cartQty = 0;
   if (user) {
     cartQty = await userHelpers.getCartQuantity(req.session.user._id);
+  }else{
+    res.redirect('/login')
   }
 
   adminHelpers.getAllProducts().then((products) => {
@@ -104,13 +107,13 @@ router.post('/add-to-cart', (req, res,next) => {
   let userID = req.session.user._id;
   const {productID} = req.body; 
   userHelpers.addToCart(productID, userID).then(() => {
-    res.json({ status: true })
+    res.json({ status: true ,productID})
   })
 })
 
 router.post('/change-count-qty', (req, res, next) => {
   userHelpers.changeProductQty(req.body).then(() => {
-    res.json({ status: true })
+    res.json({ status: true})
   })
 })
 

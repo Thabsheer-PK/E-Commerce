@@ -19,7 +19,13 @@ function addToCartBtnAjax(productID) {
       if (response.status) {
         let count = parseInt($(`#cart-count-header`).text()) || 0;
         $(`#cart-count-header`).text(count + 1)
-
+        $(`#cart-message[data-product-id="${response.productID}"]`).removeClass('d-none')
+        $(`#cart-message[data-product-id="${response.productID}"]`).removeClass('d-none').fadeIn()
+        setTimeout(() => {
+          $(`#cart-message[data-product-id="${response.productID}"]`).fadeOut(() => {
+            $(`#cart-message[data-product-id="${response.productID}"]`).addClass('d-none');
+          })
+        }, 1500)
       }
     }
   })
@@ -31,8 +37,7 @@ function changeProductQty(cartId, productId, count) {
   let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`)
   let currentQty = parseInt(qtySpan.text())
   if (currentQty <= 1 && count == -1) {
-    removeFromCart(cartId, productId)
-
+    return removeFromCart(cartId, productId)
   }
 
   $.ajax({
