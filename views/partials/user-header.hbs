@@ -18,10 +18,12 @@
         {{/if}}
         <li class="nav-item" style="position: relative;">
           <a class="nav-link" href="/cart">Cart
+            {{#if user}}
             <span class="badge bg-success rounded-circle d-inline" style="position: absolute; top:
           -0.3px;" id="cart-count-header">
               {{cartQty}}
             </span>
+            {{/if}}
           </a>
         </li>
 
