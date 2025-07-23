@@ -8,7 +8,7 @@
           <div class="card-body ">
             <h5 class="card-title">{{this.Name}}</h5>
             <p class="card-text">{{this.Description}}</p>
-            <p class="card-text font-weight-bold">₹ {{priceFormat this.Price}}</p>
+            <p class="card-text font-weight-bold">{{priceFormat this.Price}}</p>
             <button class="btn btn-primary" onclick="addToCartBtnAjax('{{this._id}}')">Add to Cart</button>
             <div id="cart-message" data-product-id="{{this._id}}" class="alert alert-success d-none"
               style="position: fixed; display:inline; padding:6px; margin-left:3em">

@@ -32,11 +32,11 @@ app.engine('hbs', exphbs.engine({
       return parseFloat(a) * parseFloat(b);
     },
     priceFormat: (price) => {
-      return parseInt(price).toLocaleString('en-IN') //indian format
+      return '₹ ' + parseInt(price).toLocaleString('en-IN') //indian format
     },
     multiplyAndFormat: (qty, price) => {
       let total = qty * price;
-      return Number(total).toLocaleString('en-IN');
+      return '₹ ' + Number(total).toLocaleString('en-IN');
     }
   }
     }))

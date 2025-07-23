@@ -30,22 +30,27 @@
               </td>
               <td class="align-middle">{{this.product.Name}}</td>
               <td class="align-middle">{{this.product.Description}}</td>
-              <td class="align-middle product-price" data-product-id="{{this.product._id}}">₹ {{priceFormat this.product.Price}}</td>
-              
+              <td class="align-middle product-price" data-product-id="{{this.product._id}}">{{priceFormat
+                this.product.Price}}</td>
+
               <td class="align-middle">
                 <div class="d-flex justify-content-center align-items-center">
-                  <button class="btn btn-sm btn-outline-danger mr-3" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                  <button class="btn btn-sm btn-outline-danger mr-3"
+                    onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
                   <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
-                  <button class="btn btn-sm btn-outline-primary ml-3" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
+                  <button class="btn btn-sm btn-outline-primary ml-3"
+                    onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
 
                 </div>
               </td>
-              <td class="align-middle product-total" data-product-id="{{this.product._id}}">₹ {{multiplyAndFormat this.quantity this.product.Price}}</td>
-              
+              <td class="align-middle product-total" data-product-id="{{this.product._id}}">{{multiplyAndFormat
+                this.quantity this.product.Price}}</td>
+
               <td class="align-middle">
                 <div class="d-flex" style="justify-content: center;">
-                  <button class="btn btn-danger mr-1" onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</button>
-                  <button class="btn btn-success ml-1">Order</button>
+                  <button class="btn btn-danger mr-1"
+                    onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</button>
+                  <a href="/place-order-form?productId={{this.product._id}}" class="btn btn-success ml-1">Order</a>
                 </div>
               </td>
 
@@ -55,15 +60,18 @@
           <tfoot>
             <tr>
               <th style="text-align: right;" colspan="6">Total:</th>
-              <th style="text-align: start;" colspan="2" class="total-cart-price">₹ {{priceFormat totalCartPrice}}</th>
+              <th style="text-align: center;" colspan="1" class="total-cart-price">{{priceFormat totalCartPrice}}</th>
+              <th colspan="1">
+                <div class="mt-2 align-midlle" style="display: inline;">
+                  <a href="/place-order-form" class="btn btn-success px-4">Place All Order</a>
+                </div>
+              </th>
             </tr>
           </tfoot>
         </table>
       </div>
 
-      <div class="mt-2" style="text-align: end;">
-        <a href="/checkout" class="btn btn-success">Order All</a>
-      </div>
+
       {{else}}
       <div class="alert alert-info text-center">
         Your cart is empty. <a href="/">Start Shopping</a>
@@ -78,22 +86,27 @@
       {{#each products}}
       <div class="card mb-3">
         <div class="card-body">
-          <div class="d-flex gap-3 cart-item"data-product-id="{{this.product._id}}">
+          <div class="d-flex gap-3 cart-item" data-product-id="{{this.product._id}}">
             <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" class="img-fluid ">
             <div>
               <h5 class="card-title">{{this.product.Name}}</h5>
               <p class="card-text">{{this.product.Description}}</p>
-              <p class="mb-1">Price: ₹ <span class="product-price" data-product-id="{{this.product._id}}">{{this.product.Price}}</span></p>
+              <p class="mb-1">Price: <span class="product-price"
+                  data-product-id="{{this.product._id}}">{{priceFormat this.product.Price}}</span></p>
 
               <div class="d-flex align-items-center gap-2 mb-2">
 
-                <button class="btn btn-sm btn-outline-danger mr-2" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
-                <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>   
-                <button class="btn btn-sm btn-outline-primary ml-2 " onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
+                <button class="btn btn-sm btn-outline-danger mr-2"
+                  onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
+                <button class="btn btn-sm btn-outline-primary ml-2 "
+                  onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
               </div>
-              <p class="product-total" data-product-id="{{this.product._id}}">Total: ₹{{multiplyAndFormat this.quantity this.product.Price}}</p>
+              <p class="product-total" data-product-id="{{this.product._id}}">Total: {{multiplyAndFormat this.quantity
+                this.product.Price}}</p>
               <div class="d-flex gap-2">
-                <a href="#" class="btn btn-sm btn-danger mr-1" onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</a>
+                <a href="#" class="btn btn-sm btn-danger mr-1"
+                  onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</a>
                 <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
               </div>
             </div>
@@ -102,8 +115,8 @@
       </div>
       {{/each}}
       <div style="text-align: end;">
-        <h5 class="total-cart-price" >Total: {{priceFormat totalCartPrice}}</h5>
-        <a href="/checkout" class="btn btn-success">Order All</a>
+        <h5 class="total-cart-price">Total: {{priceFormat totalCartPrice}}</h5>
+        <a href="/checkout" class="btn btn-success">Place All Order</a>
       </div>
       {{else}}
       <div class="alert alert-info text-center empty-cart">

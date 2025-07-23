@@ -189,5 +189,62 @@ module.exports = {
         resolve()
       })
     })
+  },
+  getOrderProducts(userId, queryData = 0) {
+    console.log('user-id', userId);
+    let OrderObj;
+    return new Promise(async (resolve, reject) => {
+      if (queryData != 0) {
+        console.log('you choose one product');
+        let orderItem = await getDB().collection(collection.CART_COLLECTION).aggregate([
+          {
+            $match: {
+              user: new ObjectId(userId)
+            }
+          }, {
+            $unwind: '$products'
+          }, {
+            $match: {
+              'products.item': new ObjectId(queryData.productId)
+            }
+          }, {
+            $project: {
+              item: '$products.item',
+              quantity: '$products.quantity'
+            }
+          },
+          {
+            $lookup: {
+              from: collection.PRODUCT_COLLECTION,
+              localField: 'item',
+              foreignField: '_id',
+              as: 'product'
+            }
+          },{
+            $unwind: '$product'
+          },{
+            $project:{
+              // item:1,
+              quantity:1,
+              'product._id':1,
+              'product.Name':1,
+              'product.Price':1,
+              'totalPrice':{
+                $multiply:['$quantity',{$toDouble:'$product.Price'}]
+              }
+            }
+          }
+        ]).toArray();
+        orderItem.forEach((item)=>{
+          item.product.Price = Number(item.product.Price)
+        })
+        resolve(orderItem);
+      } else {
+        console.log('select all order');
+      }
+
+      
+    })
+
   }
 }

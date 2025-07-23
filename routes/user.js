@@ -36,7 +36,7 @@ router.get('/', async function (req, res, next) {
   let cartQty = 0;
   if (user) {
     cartQty = await userHelpers.getCartQuantity(req.session.user._id);
-  }else{
+  } else {
     res.redirect('/login')
   }
 
@@ -95,7 +95,7 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 
   userHelpers.getCartProducts(req.session.user._id).then((products) => {
     if (products.length === 0) {
-      res.render('user/cart', { user: req.session.user,cartQty })
+      res.render('user/cart', { user: req.session.user, cartQty })
     } else {
       res.render('user/cart', { products, user: req.session.user, totalCartPrice, cartQty })
     }
@@ -103,24 +103,42 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 
 })
 
-router.post('/add-to-cart', (req, res,next) => {
+router.post('/add-to-cart', (req, res, next) => {
   let userID = req.session.user._id;
-  const {productID} = req.body; 
+  const { productID } = req.body;
   userHelpers.addToCart(productID, userID).then(() => {
-    res.json({ status: true ,productID})
+    res.json({ status: true, productID })
   })
 })
 
 router.post('/change-count-qty', (req, res, next) => {
   userHelpers.changeProductQty(req.body).then(() => {
-    res.json({ status: true})
+    res.json({ status: true })
   })
 })
 
-router.post('/remove-from-cart',(req,res,next)=>{
-  userHelpers.removeFromCart(req.body).then(()=>{
-    res.json({status:true})
+router.post('/remove-from-cart', (req, res, next) => {
+  userHelpers.removeFromCart(req.body).then(() => {
+    res.json({ status: true })
   })
+})
+
+router.get('/place-order-form', async (req, res, next) => {
+  let user = req.session.user;
+  let cartQty = await userHelpers.getCartQuantity(user._id)
+  if (req.query) {
+    userHelpers.getOrderProducts(user._id, req.query).then((orderItems) => {
+      res.render('user/place-order-form', { user, cartQty, orderItems })
+    })
+  } else {
+    userHelpers.getOrderProducts(user._id).then(() => {
+
+    })
+  }
+  // userHelpers.getOrderProducts(req.session.user._id).then(()=>{
+  //   // res.render('user/place-order-form')
+  // })
+
 })
 
 
