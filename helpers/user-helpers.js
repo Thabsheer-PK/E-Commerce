@@ -191,11 +191,8 @@ module.exports = {
     })
   },
   getOrderProducts(userId, queryData = 0) {
-    console.log('user-id', userId);
-    let OrderObj;
     return new Promise(async (resolve, reject) => {
       if (queryData != 0) {
-        console.log('you choose one product');
         let orderItem = await getDB().collection(collection.CART_COLLECTION).aggregate([
           {
             $match: {
@@ -220,31 +217,145 @@ module.exports = {
               foreignField: '_id',
               as: 'product'
             }
-          },{
+          }, {
             $unwind: '$product'
-          },{
-            $project:{
-              // item:1,
-              quantity:1,
-              'product._id':1,
-              'product.Name':1,
-              'product.Price':1,
-              'totalPrice':{
-                $multiply:['$quantity',{$toDouble:'$product.Price'}]
+          }, {
+            $project: {
+              quantity: 1,
+              'product._id': 1,
+              'product.Name': 1,
+              'product.Price': 1,
+              'totalPrice': {
+                $multiply: ['$quantity', { $toDouble: '$product.Price' }]
               }
             }
           }
         ]).toArray();
-        orderItem.forEach((item)=>{
+        orderItem.forEach((item) => {
           item.product.Price = Number(item.product.Price)
         })
         resolve(orderItem);
       } else {
-        console.log('select all order');
-      }
+        let orderItems = await getDB().collection(collection.CART_COLLECTION).aggregate([
+          {
+            $match: {
+              user: new ObjectId(userId)
+            }
+          }, {
+            $unwind: "$products"
+          }, {
+            $project: {
+              item: '$products.item',
+              quantity: '$products.quantity'
 
-      
+            }
+          }, {
+            $lookup: {
+              from: collection.PRODUCT_COLLECTION,
+              localField: 'item',
+              foreignField: '_id',
+              as: 'product'
+            }
+          }, {
+            $unwind: '$product'
+          },
+          {
+            $project: {
+              quantity: 1,
+              'product._id': 1,
+              'product.Name': 1,
+              'product.Price': 1,
+              'totalPrice': {
+                $multiply: ['$quantity', { $toDouble: '$product.Price' }]
+              }
+            }
+          }
+        ]).toArray();
+        resolve(orderItems);
+      }
     })
 
+  },
+  placeOrder: (userOrderDetails, orderItems) => {
+    let status = userOrderDetails.paymentMethod === 'COD' ? 'placed' : 'pending'
+    let orderObj = {
+      userId: new ObjectId(userOrderDetails.userId),
+      delivaryAddress: {
+        name: userOrderDetails.name,
+        city: userOrderDetails.city,
+        pincode: userOrderDetails.pincode,
+        mobile: userOrderDetails.mobile,
+        email: userOrderDetails.email,
+        addressLine: userOrderDetails.addressLine
+      },
+      OrderProducts: orderItems,
+      grandTotal: userOrderDetails.grandTotal,
+      paymentMethod: userOrderDetails.paymentMethod,
+      date: new Date(),
+      status: status
+    }
+
+    return new Promise(async (resolve, reject) => {
+      let orderDatas = await getDB().collection(collection.ORDER_COLLECTION).insertOne(orderObj)
+      console.log(orderDatas);
+
+      let userId = userOrderDetails.userId
+      if (!Array.isArray(userOrderDetails.productIds)) {
+        let oneProductId = userOrderDetails.productIds
+        await getDB().collection(collection.CART_COLLECTION).updateOne({
+          user: new ObjectId(userId),
+          'products.item': new ObjectId(oneProductId)
+        }, {
+          $pull: {
+            products: {
+              item: new ObjectId(oneProductId)
+            }
+          }
+        })
+      } else {
+        await getDB().collection(collection.CART_COLLECTION).deleteOne({ user: new ObjectId(userId) })
+      }
+      resolve(orderDatas);
+    })
+  },
+  getOrderedProductList: (userId, productIds) => {
+    return new Promise(async (resolve, reject) => {
+      if (!Array.isArray(productIds)) { //not in array format, so only one product 
+        let orderProduct = await getDB().collection(collection.CART_COLLECTION).aggregate([
+          {
+            $match: {
+              user: new ObjectId(userId)
+            }
+          }
+          , {
+            $unwind: '$products'
+          }
+          , {
+            $match: {
+              'products.item': new ObjectId(productIds)
+            }
+          }
+        ]).toArray();
+        let formatted = {
+          _id: orderProduct[0]._id,
+          user: orderProduct[0].user,
+          products: [orderProduct[0].products] // single object so manualy add array to products
+        }
+        resolve(formatted)
+
+      } else {
+        getDB().collection(collection.CART_COLLECTION).findOne({
+          user: new ObjectId(userId)
+        }).then((orderItems) => {
+          resolve(orderItems)
+        })
+      }
+    })
+  },
+  getOrderDetails: (userID) => {
+    return new Promise(async (resolve, reject) => {
+      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).toArray()
+      resolve(orderDetails)
+    })
   }
 }

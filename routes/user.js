@@ -126,21 +126,38 @@ router.post('/remove-from-cart', (req, res, next) => {
 router.get('/place-order-form', async (req, res, next) => {
   let user = req.session.user;
   let cartQty = await userHelpers.getCartQuantity(user._id)
-  if (req.query) {
+  if (req.query.productId) {
     userHelpers.getOrderProducts(user._id, req.query).then((orderItems) => {
-      res.render('user/place-order-form', { user, cartQty, orderItems })
+      let grandTotal = orderItems[0].totalPrice;
+      res.render('user/place-order-form', { user, cartQty, orderItems, grandTotal })
     })
   } else {
-    userHelpers.getOrderProducts(user._id).then(() => {
-
+    userHelpers.getOrderProducts(user._id).then(async (orderItems) => {
+      let grandTotal = await getCartTotalPrice(user._id)
+      res.render('user/place-order-form', { user, cartQty, grandTotal, orderItems })
     })
-  }
-  // userHelpers.getOrderProducts(req.session.user._id).then(()=>{
-  //   // res.render('user/place-order-form')
-  // })
 
+  }
 })
 
+router.post('/place-order', async (req, res, next) => {
+  let orderItems = await userHelpers.getOrderedProductList(req.session.user._id, req.body.productIds)
 
+  userHelpers.placeOrder(req.body, orderItems).then((response) => {
+    res.json({ status: true })
+  })
+})
+
+router.get('/order-success', async (req, res, next) => {
+  let user = req.session.user;
+  let cartQty = await userHelpers.getCartQuantity(req.session.user._id)
+  res.render('user/order-success', { user, cartQty })
+})
+router.get('/orders', async (req, res, next) => {
+  let user = req.session.user
+  let orders = await userHelpers.getOrderDetails(user._id)
+  let cartQty = await userHelpers.getCartQuantity(user._id)
+  res.render('user/orders', {user:user._id,orders,cartQty})
+})
 
 module.exports = router;

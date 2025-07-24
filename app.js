@@ -37,9 +37,15 @@ app.engine('hbs', exphbs.engine({
     multiplyAndFormat: (qty, price) => {
       let total = qty * price;
       return '₹ ' + Number(total).toLocaleString('en-IN');
+    },
+    formatDate: (date)=>{
+      return new Date(date).toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      })
     }
   }
-    }))
+}))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

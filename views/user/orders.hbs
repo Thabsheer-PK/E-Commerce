@@ -1,0 +1,52 @@
+<div class="container mt-5">
+  <h2 class="mb-4">🛒 My Orders</h2>
+
+  {{#if orders.length}}
+    {{#each orders}}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Order ID:</strong> {{this._id}}
+          
+        </div>
+        <div class="card-body">
+          <p><strong>Ordered On:</strong> {{formatDate this.date}}</p>
+          <p><strong>Payment Method:</strong> {{this.paymentMethod}}</p>
+          <p><strong>Grand Total:</strong> {{priceFormat this.grandTotal}}</p>
+
+          <hr>
+          <h5>Delivery Address</h5>
+          <p>
+            {{this.delivaryAddress.name}},<br>
+            {{this.delivaryAddress.addressLine}},<br>
+            {{this.delivaryAddress.city}} - {{this.delivaryAddress.pincode}}<br>
+            📞 {{this.delivaryAddress.mobile}}<br>
+            📧 {{this.delivaryAddress.email}}
+          </p>
+
+          <hr>
+          <h5>Items Ordered</h5>
+          <table class="table table-sm table-bordered mt-2">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Product ID</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each this.OrderProducts.products}}
+                <tr>
+                  <td>{{@index}}</td>
+                  <td>{{this.item}}</td>
+                  <td>{{this.quantity}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {{/each}}
+  {{else}}
+    <p>You haven't placed any orders yet.</p>
+  {{/if}}
+</div>

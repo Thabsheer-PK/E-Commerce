@@ -1,8 +1,7 @@
 <section class="mt-5">
-  <div class="container">
-    <h2 class="mb-4">Place Order</h2>
-
-    <form action="/submit-order" method="POST">
+  <form action="/submit-order" id="orderForm" method="POST">
+    <div class="container">
+      <h2 class="mb-4">Place Order</h2>
       <!-- ORDERED PRODUCTS TABLE -->
       <div class="mb-4">
         <h5>Items:</h5>
@@ -18,6 +17,7 @@
             </tr>
           </thead>
           <tbody>
+            <input type="hidden" name="userId" value="{{user._id}}">
             {{#each orderItems}}
             <tr>
               <td>{{inc @index}}</td>
@@ -27,46 +27,57 @@
               <td>{{this.quantity}}</td>
               <td>{{multiplyAndFormat this.quantity this.product.Price}}</td>
 
-              <!-- Hidden Fields to pass product IDs and quantities -->
-              <input type="hidden" name="productIds[]" value="{{this._id}}">
-              <input type="hidden" name="quantities[]" value="{{this.quantity}}">
+              <input type="hidden" name="productIds" value="{{this.product._id}}">
+              
             </tr>
+            {{/each}}
           </tbody>
         </table>
-        <h4 class="text-end">Grand Total: {{priceFormat this.totalPrice}}</h4>
-        {{/each}}
-        <input type="hidden" name="total" value="{{total}}">
+
+        <h4 class="text-end">Grand Total: {{priceFormat grandTotal}}</h4>
+        <input type="hidden" name="grandTotal" value="{{grandTotal
+        }}">
+        
       </div>
 
-      <!-- CUSTOMER DETAILS -->
-      <div class="row mb-4 fw-bold">
-        <div class="col-md-4">
-          <label class="form-label">Full Name</label>
-          <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+      <!-- CUSTOMER & ADDRESS DETAILS -->
+      <div class="fw-bold mb-4">
+        <!-- Row 1 -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">City</label>
+            <input type="text" name="city" class="form-control" required placeholder="Enter your city">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Pincode</label>
+            <input type="text" name="pincode" class="form-control" required placeholder="Enter your area pincode">
+          </div>
         </div>
-        <div class="col-md-4">
-          <label class="form-label">Mobile</label>
-          <input type="text" name="mobile" class="form-control" required placeholder="Enter your 10-digit mobile numberr">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" required placeholder="Enter your email address">
-        </div>
-      </div>
 
-      <!-- ADDRESS FIELDS -->
-      <div class="row mb-4 fw-bold">
-        <div class="col-md-3">
-          <label class="form-label">City</label>
-          <input type="text" name="city" class="form-control" required placeholder="Enter your city">
+        <!-- Row 2 -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Mobile</label>
+            <input type="text" name="mobile" class="form-control" required placeholder="10-digit mobile number">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required placeholder="Enter your email address">
+          </div>
+
         </div>
-        <div class="col-md-3">
-          <label class="form-label">Pincode</label>
-          <input type="text" name="pincode" class="form-control" required placeholder="Enter your area pincode">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Address Line</label>
-          <input type="text" name="addressLine" class="form-control" required placeholder="Enter your full address">
+
+        <!-- Row 3 -->
+        <div class="row mb-3">
+
+          <div class="col-md-12">
+            <label class="form-label">Address Line</label>
+            <input type="text" name="addressLine" class="form-control" required placeholder="Enter your full address">
+          </div>
         </div>
       </div>
 
@@ -74,7 +85,7 @@
       <div class="mb-4">
         <label class="form-label">Select Payment Method</label>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+          <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD">
           <label class="form-check-label" for="cod">Cash on Delivery</label>
         </div>
         <div class="form-check">
@@ -85,8 +96,9 @@
 
       <!-- SUBMIT -->
       <div class="text-end">
-        <button type="submit" class="btn btn-primary">Confirm Order</button>
+        <button type="submit" class="btn btn-primary mb-5">Confirm Order</button>
       </div>
-    </form>
+    </div>
+  </form>
   </div>
 </section>
