@@ -157,6 +157,7 @@ router.get('/orders', async (req, res, next) => {
   let user = req.session.user
   let orders = await userHelpers.getOrderDetails(user._id)
   let cartQty = await userHelpers.getCartQuantity(user._id)
+  
   res.render('user/orders', {user:user._id,orders,cartQty})
 })
 

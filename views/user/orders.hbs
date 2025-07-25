@@ -36,7 +36,7 @@
             <tbody>
               {{#each this.OrderProducts.products}}
                 <tr>
-                  <td>{{@index}}</td>
+                  <td>{{inc @index}}</td>
                   <td>{{this.item}}</td>
                   <td>{{this.quantity}}</td>
                 </tr>

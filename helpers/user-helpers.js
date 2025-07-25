@@ -294,7 +294,6 @@ module.exports = {
       date: new Date(),
       status: status
     }
-
     return new Promise(async (resolve, reject) => {
       let orderDatas = await getDB().collection(collection.ORDER_COLLECTION).insertOne(orderObj)
       console.log(orderDatas);
@@ -354,7 +353,28 @@ module.exports = {
   },
   getOrderDetails: (userID) => {
     return new Promise(async (resolve, reject) => {
-      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).toArray()
+      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).sort({date: -1}).toArray() //sort used latest order show on top in orders page
+
+      let orderDetails22 = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+        {
+          $match: {
+            userId : new ObjectId(userID)
+          }
+        },{
+          $unwind : '$OrderProducts.products'
+        },{
+          $lookup:{
+            from: collection.PRODUCT_COLLECTION,
+            localField: 'OrderProducts.products.item',
+            foreignField: '_id',
+            as: 'productDetails'
+          }
+          
+        },{
+         $unwind: '$productDetails'
+        }
+      ]).toArray();
+      console.log(orderDetails22);
       resolve(orderDetails)
     })
   }
