@@ -5,7 +5,7 @@
     {{#each orders}}
       <div class="card mb-4 shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <strong>Order ID:</strong> {{this._id}}
+          <strong>Order ID:</strong> {{this.orderNumber}}
           
         </div>
         <div class="card-body">
@@ -19,8 +19,7 @@
             {{this.delivaryAddress.name}},<br>
             {{this.delivaryAddress.addressLine}},<br>
             {{this.delivaryAddress.city}} - {{this.delivaryAddress.pincode}}<br>
-            📞 {{this.delivaryAddress.mobile}}<br>
-            📧 {{this.delivaryAddress.email}}
+            {{this.delivaryAddress.mobile}}<br>
           </p>
 
           <hr>

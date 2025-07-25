@@ -277,24 +277,34 @@ module.exports = {
 
   },
   placeOrder: (userOrderDetails, orderItems) => {
-    let status = userOrderDetails.paymentMethod === 'COD' ? 'placed' : 'pending'
-    let orderObj = {
-      userId: new ObjectId(userOrderDetails.userId),
-      delivaryAddress: {
-        name: userOrderDetails.name,
-        city: userOrderDetails.city,
-        pincode: userOrderDetails.pincode,
-        mobile: userOrderDetails.mobile,
-        email: userOrderDetails.email,
-        addressLine: userOrderDetails.addressLine
-      },
-      OrderProducts: orderItems,
-      grandTotal: userOrderDetails.grandTotal,
-      paymentMethod: userOrderDetails.paymentMethod,
-      date: new Date(),
-      status: status
-    }
     return new Promise(async (resolve, reject) => {
+      let status = userOrderDetails.paymentMethod === 'COD' ? 'placed' : 'pending'
+      const db = getDB();
+      let counter = await db.collection('counters').findOneAndUpdate( //need updated document so use findOneUpdate()
+        { _id: 'orderId' },
+        { $inc: { seq: 1 } },
+        { returnDocument: 'after', upsert: true } //returnDocAfter-counter have updated value, upsert-create collection and insert document if counters collection does't exist
+      )
+      console.log(counter);
+      let orderNumber = `ORD00${counter.seq}`
+
+      let orderObj = {
+        userId: new ObjectId(userOrderDetails.userId),
+        orderNumber: orderNumber,
+        delivaryAddress: {
+          name: userOrderDetails.name,
+          city: userOrderDetails.city,
+          pincode: userOrderDetails.pincode,
+          mobile: userOrderDetails.mobile,
+          email: userOrderDetails.email,
+          addressLine: userOrderDetails.addressLine
+        },
+        OrderProducts: orderItems,
+        grandTotal: userOrderDetails.grandTotal,
+        paymentMethod: userOrderDetails.paymentMethod,
+        date: new Date(),
+        status: status
+      }
       let orderDatas = await getDB().collection(collection.ORDER_COLLECTION).insertOne(orderObj)
       console.log(orderDatas);
 
@@ -325,11 +335,9 @@ module.exports = {
             $match: {
               user: new ObjectId(userId)
             }
-          }
-          , {
+          }, {
             $unwind: '$products'
-          }
-          , {
+          } , {
             $match: {
               'products.item': new ObjectId(productIds)
             }
@@ -353,29 +361,9 @@ module.exports = {
   },
   getOrderDetails: (userID) => {
     return new Promise(async (resolve, reject) => {
-      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).sort({date: -1}).toArray() //sort used latest order show on top in orders page
-
-      let orderDetails22 = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
-        {
-          $match: {
-            userId : new ObjectId(userID)
-          }
-        },{
-          $unwind : '$OrderProducts.products'
-        },{
-          $lookup:{
-            from: collection.PRODUCT_COLLECTION,
-            localField: 'OrderProducts.products.item',
-            foreignField: '_id',
-            as: 'productDetails'
-          }
-          
-        },{
-         $unwind: '$productDetails'
-        }
-      ]).toArray();
-      console.log(orderDetails22);
-      resolve(orderDetails)
+      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).sort({ date: -1 }).toArray() //sort used latest order show on top in orders page
+      console.log('orderdetailsOLD', orderDetails);
+      resolve(orderDetails);
     })
   }
 }
