@@ -162,5 +162,12 @@ router.get('/orders', async (req, res, next) => {
   res.render('user/orders', {user:user._id,orders,cartQty,user})
 })
 
+router.get('/ordered-products',async (req,res,next)=>{ 
+  let user = req.session.user;
+  let orderId = req.query.orderId
+  let order = await userHelpers.getViewOrderProducts(user._id,orderId);
+  let cartQty = await userHelpers.getCartQuantity(user._id);
+  res.render('user/ordered-products',{products:order[0].OrderProducts.products,user,cartQty})
+})
 
 module.exports = router;

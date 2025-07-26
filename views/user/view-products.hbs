@@ -4,7 +4,10 @@
       {{#each products}}
       <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
         <div class="card h-100  text-start">
-          <img class="img-fluid custom-image" src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}">
+          <div class="text-center m-3">
+            <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" class="img-fluid" style="height: 200px; object-fit:contain">
+          </div>
+
           <div class="card-body ">
             <h5 class="card-title">{{this.Name}}</h5>
             <p class="card-text">{{this.Description}}</p>

@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <h3 class="my-4">📦 Ordered Products</h3>
+
+  <div class="row">
+    {{#each products}}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+        <div class="card h-100 shadow-sm border">
+          <div class="card-body">
+            <div class="text-center mb-5">
+              <img src="/product-images/{{this.item}}.jpg" alt="" class="img-fluid" style="height:180px; object-fit:contain">
+            </div>
+            <h5 class="card-title fw-bold">{{this.productInfo.Name}}</h5>
+            <h6 class="text-muted">{{this.productInfo.Category}}</h6>
+            <p class="card-text mb-2">{{this.productInfo.Description}}</p>
+            <p class="mb-1">💰 <strong>Price:</strong> {{priceFormat this.productInfo.Price}}</p>
+            <p>📦 <strong>Quantity:</strong> {{this.quantity}}</p>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+
+  <div class="mt-4">
+    <a href="/orders" class="btn btn-secondary">← Back to Orders</a>
+  </div>
+</div>

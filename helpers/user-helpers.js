@@ -363,7 +363,7 @@ module.exports = {
     return new Promise(async (resolve, reject) => {
       let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
         {
-          $match:{
+          $match: {
             userId: new ObjectId(userID)
           }
         },
@@ -419,6 +419,68 @@ module.exports = {
       ]).sort({ date: -1 }).toArray()
       resolve(orderDetails);
     })
+  },
+  getViewOrderProducts: (userID, orderId) => {
+    return new Promise(async (resolve, reject) => {
+      console.log('userID', userID);
+      console.log('orderId', orderId);
+      let orderProducts = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+        {
+          $match: {
+            _id: new ObjectId(orderId),
+            userId: new ObjectId(userID)
+          }
+        }, {
+          $unwind: '$OrderProducts.products'
+        }, {
+          $lookup: {
+            from: collection.PRODUCT_COLLECTION,
+            localField: 'OrderProducts.products.item',
+            foreignField: '_id',
+            as: 'productDetails'
+          }
+        }, {
+          $unwind: '$productDetails'
+        } , {
+          $addFields: {
+            'OrderProducts.products.productInfo': '$productDetails'
+          }
+        }, {
+          $group: {
+            _id: '$_id',
+            orderNumber: { $first: '$orderNumber' },
+            userId: { $first: '$userId' },
+            delivaryAddress: { $first: '$delivaryAddress' },
+            grandTotal: { $first: '$grandTotal' },
+            paymentMethod: { $first: '$paymentMethod' },
+            date: { $first: '$date' },
+            status: { $first: '$status' },
+            OrderProducts_duplicate: {
+              $first: {
+                _id: '$OrderProducts._id',
+                user: '$OrderProducts.user'
+              }
+            },
+            products: {
+              $push: '$OrderProducts.products'
+            }
+          }
+        }, {
+          $addFields: {
+            OrderProducts: {
+              _id: 'OrderProducts_duplicate._id',
+              user: '$OrderProducts_duplicate.user',
+              products: '$products'
+            }
+          }
+        }, {
+          $project: {
+            products: 0,
+            OrderProducts_duplicate: 0
+          }
+        }
+      ]).toArray();
+      resolve(orderProducts);
+    })
   }
-  
 }

@@ -2,7 +2,7 @@
   <h2 class="mb-4">🛒 My Orders</h2>
 
   {{#if orders.length}}
-    {{#each orders}}
+    {{#each orders as |order|}}
       <div class="card mb-4 shadow-lg">
         <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Order ID:</strong> {{this.orderNumber}}
@@ -50,10 +50,9 @@
                   </td>
                   <td>{{this.productInfo.Name}}</td>
                   <td>{{this.quantity}}</td>
-                  
                   {{#if @first}}
                     <td rowspan="{{../OrderProducts.products.length}}">
-                      <a href="/order-products/{{this._id}}" class="btn btn-outline-success m-2">View Details</a>
+                      <a href="/ordered-products?orderId={{order._id}}" class="btn btn-outline-success m-2">View Details</a>
                     </td>
                   {{/if}}
                 </tr>
