@@ -327,7 +327,7 @@ module.exports = {
       resolve(orderDatas);
     })
   },
-  getOrderedProductList: (userId, productIds) => {
+  getOrderedCarttList: (userId, productIds) => {
     return new Promise(async (resolve, reject) => {
       if (!Array.isArray(productIds)) { //not in array format, so only one product 
         let orderProduct = await getDB().collection(collection.CART_COLLECTION).aggregate([
@@ -337,7 +337,7 @@ module.exports = {
             }
           }, {
             $unwind: '$products'
-          } , {
+          }, {
             $match: {
               'products.item': new ObjectId(productIds)
             }
@@ -361,9 +361,64 @@ module.exports = {
   },
   getOrderDetails: (userID) => {
     return new Promise(async (resolve, reject) => {
-      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).find({ userId: new ObjectId(userID) }).sort({ date: -1 }).toArray() //sort used latest order show on top in orders page
-      console.log('orderdetailsOLD', orderDetails);
+      let orderDetails = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+        {
+          $match:{
+            userId: new ObjectId(userID)
+          }
+        },
+        {
+          $unwind: "$OrderProducts.products"
+        }, {
+          $lookup: {
+            from: collection.PRODUCT_COLLECTION,
+            localField: "OrderProducts.products.item",
+            foreignField: "_id",
+            as: "productDetails"
+          }
+        }, {
+          $unwind: "$productDetails"
+        }, {
+          $addFields: {
+            "OrderProducts.products.productInfo": "$productDetails"
+          }
+        }, {
+          $group: {
+            _id: "$_id",
+            orderNumber: { $first: "$orderNumber" },
+            userId: { $first: "$userId" },
+            delivaryAddress: { $first: "$delivaryAddress" },
+            grandTotal: { $first: "$grandTotal" },
+            paymentMethod: { $first: "$paymentMethod" },
+            date: { $first: "$date" },
+            status: { $first: "$status" },
+            OrderProducts_duplicate: {
+              $first: {
+                _id: "$OrderProducts._id",
+                user: "$OrderProducts.user"
+              }
+            },
+            products: {
+              $push: "$OrderProducts.products"
+            }
+          }
+        }, {
+          $addFields: {
+            OrderProducts: {
+              _id: "$OrderProducts_duplicate._id",
+              user: "$OrderProducts_duplicate.user",
+              products: "$products"
+            }
+          }
+        }, {
+          $project: {
+            products: 0,
+            OrderProducts_duplicate: 0
+          }
+        }
+      ]).sort({ date: -1 }).toArray()
       resolve(orderDetails);
     })
   }
+  
 }

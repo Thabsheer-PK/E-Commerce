@@ -141,7 +141,7 @@ router.get('/place-order-form', async (req, res, next) => {
 })
 
 router.post('/place-order', async (req, res, next) => {
-  let orderItems = await userHelpers.getOrderedProductList(req.session.user._id, req.body.productIds)
+  let orderItems = await userHelpers.getOrderedCarttList(req.session.user._id, req.body.productIds)
 
   userHelpers.placeOrder(req.body, orderItems).then((response) => {
     res.json({ status: true })
@@ -157,8 +157,10 @@ router.get('/orders', async (req, res, next) => {
   let user = req.session.user
   let orders = await userHelpers.getOrderDetails(user._id)
   let cartQty = await userHelpers.getCartQuantity(user._id)
+  // let products = await userHelpers.getOrderProducts(user._id)
   
-  res.render('user/orders', {user:user._id,orders,cartQty})
+  res.render('user/orders', {user:user._id,orders,cartQty,user})
 })
+
 
 module.exports = router;
