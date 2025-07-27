@@ -158,16 +158,25 @@ router.get('/orders', async (req, res, next) => {
   let orders = await userHelpers.getOrderDetails(user._id)
   let cartQty = await userHelpers.getCartQuantity(user._id)
   // let products = await userHelpers.getOrderProducts(user._id)
-  
-  res.render('user/orders', {user:user._id,orders,cartQty,user})
+
+  res.render('user/orders', { user: user._id, orders, cartQty, user })
 })
 
-router.get('/ordered-products',async (req,res,next)=>{ 
+router.get('/ordered-products', async (req, res, next) => {
   let user = req.session.user;
   let orderId = req.query.orderId
-  let order = await userHelpers.getViewOrderProducts(user._id,orderId);
+  let order = await userHelpers.getViewOrderProducts(user._id, orderId);
   let cartQty = await userHelpers.getCartQuantity(user._id);
-  res.render('user/ordered-products',{products:order[0].OrderProducts.products,user,cartQty})
+  res.render('user/ordered-products', { products: order[0].OrderProducts.products, user, cartQty })
+})
+
+router.get('/profile', async (req, res, next) => {
+  let user = req.session.user;
+  if (!user) {
+    return res.redirect('/login')
+  }
+  let cartQty = await userHelpers.getCartQuantity(user._id);
+  res.render('user/profile', { user, cartQty })
 })
 
 module.exports = router;

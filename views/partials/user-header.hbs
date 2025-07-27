@@ -1,54 +1,47 @@
-<header class="position-sticky top-0 bg-light shadow-sm z-3" style="z-index: 1030;">
+<header class="position-sticky top-0 bg-light shadow-sm z-3 py-2" style="z-index: 1030;">
   <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Shopping Cart</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
-      aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand fw-bold" href="#">Shopping Cart</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
+      aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-        <li class="nav-item active">
-          <a class="nav-link" href="/">Products <span class="sr-only">(current)</span></a>
+    <div class="collapse navbar-collapse justify-content-between" id="navbarToggler">
+      <!-- Left Nav Items -->
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Products</a>
         </li>
+
         {{#if user}}
         <li class="nav-item">
           <a class="nav-link" href="/orders">Orders</a>
         </li>
         {{/if}}
-        <li class="nav-item" style="position: relative;">
-          <a class="nav-link" href="/cart">Cart
+
+        <li class="nav-item position-relative">
+          <a class="nav-link d-inline-flex align-items-center position-relative" href="/cart">
+            Cart
             {{#if user}}
-            <span class="badge bg-success rounded-circle d-inline" style="position: absolute; top:
-          -0.3px;" id="cart-count-header">
+            <span class="badge bg-success rounded-circle position-absolute"
+              style="top: -0.3rem; right: -1.2rem; font-size: 0.7rem; min-width: 1.4rem;" id="cart-count-header">
               {{cartQty}}
             </span>
+
             {{/if}}
           </a>
         </li>
-
       </ul>
-      <div class="dropdown mr-5">
-        <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          {{#if user}}
-          <i class="bi bi-person"></i>
-          {{user.Name}}
-          {{else}}
-          <i class="bi bi-person"></i>
-          {{/if}}
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          {{#if user}}
-          <a class="dropdown-item" href="/logout">Logout</a>
-          {{else}}
-          <a class="dropdown-item" href="/login">Login</a>
-          <a class="dropdown-item" href="/signup">Signup</a>
-          {{/if}}
 
-        </div>
+      <div class="dropdown mr-2">
+        <a href="/profile" class="btn btn-outline-dark">
+          <i class="bi bi-person-circle"></i>
+          <span>
+            {{#if user}}{{user.Name}}{{else}}Account{{/if}}
+          </span>
+        </a>
       </div>
-
     </div>
   </nav>
 </header>
