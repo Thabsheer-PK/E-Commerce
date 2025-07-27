@@ -176,7 +176,8 @@ router.get('/profile', async (req, res, next) => {
     return res.redirect('/login')
   }
   let cartQty = await userHelpers.getCartQuantity(user._id);
-  res.render('user/profile', { user, cartQty })
+  let orders = await userHelpers.getOrderDetails(user._id)
+  res.render('user/profile', { user, cartQty, orders })
 })
 
 module.exports = router;

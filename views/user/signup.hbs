@@ -1,24 +1,57 @@
-<section>
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6 m-auto">
-        <h2 class="text-center mt-3">Sign Up</h2>
-        <form action="/signup" method="post">
-          <div class="form-group">
-            <label for="inputName">Name</label>
-            <input type="text" class="form-control" id="inputName" name="Name" placeholder="Enter Full Name">
+<section class="d-flex align-items-center bg-light with-header">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-4">
+            <h3 class="mb-4 text-center text-primary">Create Account</h3>
+
+            <form action="/signup" method="post" novalidate id="signupForm">
+              <!-- Name -->
+              <div class="mb-3">
+                <label for="inputName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="inputName" name="Name" required minlength="3"
+                  placeholder="Enter your full name">
+                <div class="invalid-feedback">Please enter your full name (min 3 characters).</div>
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="InputEmail1" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="InputEmail1" name="Email" required
+                  placeholder="Enter your email">
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+              </div>
+
+              <!-- Mobile -->
+              <div class="mb-3">
+                <label for="InputMobile" class="form-label">Mobile Number</label>
+                <input type="tel" class="form-control" id="InputMobile" name="Mobile" pattern="\d{10}" required
+                  placeholder="10-digit number">
+                <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+              </div>
+
+              <!-- Password -->
+              <div class="mb-3">
+                <label for="InputPassword1" class="form-label">Password</label>
+                <input type="password" class="form-control" id="InputPassword1" name="Password" required minlength="6"
+                  placeholder="At least 6 characters">
+                <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+              </div>
+
+              <!-- Submit -->
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-success">Sign Up</button>
+              </div>
+
+              <!-- Login redirect -->
+              <div class="text-center mt-3">
+                <a href="/login" class="text-decoration-none">Already have an account?</a>
+              </div>
+            </form>
+
           </div>
-          <div class="form-group">
-            <label for="InputEmail1">Email address</label>
-            <input type="email" class="form-control" id="InputEmail1" name="Email"  placeholder="Enter email">
-          </div>
-          <div class="form-group">
-            <label for="InputPassword1">Password</label>
-            <input type="password" class="form-control" id="Password1" name="Password" placeholder="Password">
-          </div>
-          <a href="/login" ><p>You have already an account?</p></a>
-          <button type="submit" class="btn btn-success">Submit</button>
-        </form>
+        </div>
       </div>
     </div>
   </div>

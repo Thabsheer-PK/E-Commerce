@@ -45,3 +45,8 @@ th {
   color: white !important;
   border-radius: 100px !important;
 }
+
+.with-header {
+  min-height: calc(100vh - 72px);
+  /* adjust based on your header height */
+}

@@ -43,6 +43,9 @@ app.engine('hbs', exphbs.engine({
         dateStyle: 'medium',
         timeStyle: 'short'
       })
+    },
+    capitalize: (data)=>{
+      return data.toUpperCase();
     }
   }
 }))
