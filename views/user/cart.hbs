@@ -1,129 +1,54 @@
-<section class="cart-section mt-5">
-  <div class="container-fluid">
-    <h2 class="mb-4">{{user.Name}}'s Cart</h2>
+{{#if products}}
+<div class="container mt-3 cart-items">
+  <div class="row">
 
-    {{!-- 1st div, block to display all screen, it disply on md and above --}}
-
-    <div class="d-none d-md-block desktop-cart">
-      {{#if products}}
-      <div class="table-responsive">
-        <table class="table table-bordered text-center">
-          <thead class="table-dark align-middle">
-            <tr class="align-middle">
-              <th class="align-middle">#</th>
-              <th class="align-middle">Image</th>
-              <th class="align-middle">Name</th>
-              <th class="align-middle">Description</th>
-              <th class="align-middle">Price (₹)</th>
-              <th class="align-middle">Quantity</th>
-              <th class="align-middle">Total (₹)</th>
-              <th class="align-middle">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each products}}
-
-            <tr class="cart-item" data-product-id="{{this.product._id}}">
-              <td class="align-middle">{{inc @index}}</td>
-              <td>
-                <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" width="80">
-              </td>
-              <td class="align-middle">{{this.product.Name}}</td>
-              <td class="align-middle">{{this.product.Description}}</td>
-              <td class="align-middle product-price" data-product-id="{{this.product._id}}">{{priceFormat
-                this.product.Price}}</td>
-
-              <td class="align-middle">
-                <div class="d-flex justify-content-center align-items-center">
-                  <button class="btn btn-sm btn-outline-danger mr-3"
-                    onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
-                  <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
-                  <button class="btn btn-sm btn-outline-primary ml-3"
-                    onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
-
-                </div>
-              </td>
-              <td class="align-middle product-total" data-product-id="{{this.product._id}}">{{multiplyAndFormat
-                this.quantity this.product.Price}}</td>
-
-              <td class="align-middle">
-                <div class="d-flex" style="justify-content: center;">
-                  <button class="btn btn-danger mr-1"
-                    onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</button>
-                  <a href="/place-order-form?productId={{this.product._id}}" class="btn btn-success ml-1">Order</a>
-                </div>
-              </td>
-
-            </tr>
-            {{/each}}
-          </tbody>
-          <tfoot>
-            <tr>
-              <th style="text-align: right;" colspan="6">Total:</th>
-              <th style="text-align: center;" colspan="1" class="total-cart-price">{{priceFormat totalCartPrice}}</th>
-              <th colspan="1">
-                <div class="mt-2 align-midlle" style="display: inline;">
-                  <a href="/place-order-form" class="btn btn-success px-4">Place All Order</a>
-                </div>
-              </th>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-
-      {{else}}
-      <div class="alert alert-info text-center">
-        Your cart is empty. <a href="/">Start Shopping</a>
-      </div>
-      {{/if}}
-
-    </div>
-
-    {{!-- when under medium devices --}}
-    <div class="d-block d-md-none mobile-cart">
-      {{#if products}}
+    <div class="col-md-7">
       {{#each products}}
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex gap-3 cart-item" data-product-id="{{this.product._id}}">
-            <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" class="img-fluid ">
-            <div>
-              <h5 class="card-title">{{this.product.Name}}</h5>
-              <p class="card-text">{{this.product.Description}}</p>
-              <p class="mb-1">Price: <span class="product-price"
-                  data-product-id="{{this.product._id}}">{{priceFormat this.product.Price}}</span></p>
+      <div class="cart-item border rounded shadow-sm p-3 mb-3" data-product-id="{{this.product._id}}">
+        <div class="d-flex flex-row align-items-start gap-3">
+          <!-- Image -->
+          <div class="text-center my-auto">
+            <img src="/product-images/{{this.product._id}}.jpg" alt="{{this.product.Name}}" width="100" style="object-fit: contain;">
+          </div>
 
-              <div class="d-flex align-items-center gap-2 mb-2">
+          <!-- Product Info -->
+          <div class="flex-grow-1">
+            <h5 class="mb-1">{{this.product.Name}}</h5>
+            <p class="text-muted mb-1">{{this.product.Description}}</p>
+            <p class="mb-1">Price: <span class="product-price" data-product-id="{{this.product._id}}">{{priceFormat this.product.Price}}</span></p>
 
-                <button class="btn btn-sm btn-outline-danger mr-2"
-                  onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">-</button>
-                <span class="product-qty" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
-                <button class="btn btn-sm btn-outline-primary ml-2 "
-                  onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
-              </div>
-              <p class="product-total" data-product-id="{{this.product._id}}">Total: {{multiplyAndFormat this.quantity
-                this.product.Price}}</p>
-              <div class="d-flex gap-2">
-                <a href="#" class="btn btn-sm btn-danger mr-1"
-                  onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</a>
-                <a href="#" class="btn btn-sm btn-success ml-1">Order</a>
-              </div>
+            <div class="d-flex align-items-center mt-2">
+              <button class="btn btn-sm btn-outline-danger me-2" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',-1)">−</button>
+              <span class="product-qty px-2" data-product-id="{{this.product._id}}">{{this.quantity}}</span>
+              <button class="btn btn-sm btn-outline-primary ms-2" onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1)">+</button>
             </div>
+
+            <p class="mt-2">
+              Total: <span class="product-total" data-product-id="{{this.product._id}}">{{multiplyAndFormat this.quantity this.product.Price}}</span>
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex flex-column my-auto" style="width: 9rem;">
+            <button class="btn btn-danger mb-2" onclick="removeFromCart('{{this._id}}','{{this.product._id}}')">Remove</button>
+            <a href="/place-order-form?productId={{this.product._id}}" class="btn btn-success">Order</a>
           </div>
         </div>
       </div>
       {{/each}}
-      <div style="text-align: end;">
-        <h5 class="total-cart-price">Total: {{priceFormat totalCartPrice}}</h5>
-        <a href="/checkout" class="btn btn-success">Place All Order</a>
+    </div>
+
+    <div class="col-md-5">
+      <div class="border rounded shadow-sm p-4 position-sticky" style="top: 100px;">
+        <h5>Grand Total: <span class="total-cart-price">{{priceFormat totalCartPrice}}</span></h5>
+        <a href="/place-order-form" class="btn placeOderBtn mt-3 w-100" style="">Place All Order</a>
       </div>
-      {{else}}
-      <div class="alert alert-info text-center empty-cart">
-        Your cart is empty. <a href="/">Start Shopping</a>
-      </div>
-      {{/if}}
     </div>
 
   </div>
-</section>
+</div>
+{{else}}
+<div class="alert alert-info mt-4 text-center">
+  Your cart is empty. <a href="/">Start Shopping</a>
+</div>
+{{/if}}

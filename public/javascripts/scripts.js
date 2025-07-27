@@ -19,22 +19,28 @@ function addToCartBtnAjax(productID) {
       if (response.status) {
         let count = parseInt($(`#cart-count-header`).text()) || 0;
         $(`#cart-count-header`).text(count + 1)
-        $(`#cart-message[data-product-id="${response.productID}"]`).removeClass('d-none')
-        $(`#cart-message[data-product-id="${response.productID}"]`).removeClass('d-none').fadeIn()
+
+        let timeoutID;
         setTimeout(() => {
-          $(`#cart-message[data-product-id="${response.productID}"]`).fadeOut(() => {
-            $(`#cart-message[data-product-id="${response.productID}"]`).addClass('d-none');
-          })
-        }, 1500)
+          $(`.cart-message[data-product-id="${response.productID}"]`).addClass('cart-added-message')
+        }, 0)
+
+        clearTimeout(timeoutID)
+        timeoutID = setTimeout(() => {
+          $(`.cart-message[data-product-id="${response.productID}"]`).removeClass('cart-added-message')
+        }, 2000);
+
+
+
       }
     }
   })
 }
 
 function changeProductQty(cartId, productId, count) {
-  let isMobile = window.innerWidth < 768;
-  let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
-  let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`)
+  // let isMobile = window.innerWidth < 768;
+  // let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
+  let qtySpan = $(`.cart-items .product-qty[data-product-id="${productId}"]`)
   let currentQty = parseInt(qtySpan.text())
   if (currentQty <= 1 && count == -1) {
     return removeFromCart(cartId, productId)
@@ -59,15 +65,15 @@ function changeProductQty(cartId, productId, count) {
         $(`#cart-count-header`).text(cartHeaderQty);
 
         //product price total
-        let priceText = $(`${layoutContainer} .product-price[data-product-id="${productId}"]`).text()
+        let priceText = $(`.cart-items .product-price[data-product-id="${productId}"]`).text()
         let pricePerUnit = extraNumericValue(priceText);
         let newTotal = pricePerUnit * newQty;
         let formattedTotal = formatINR(newTotal);
-        let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`)
+        let productTotal = $(`.cart-items .product-total[data-product-id="${productId}"]`)
         productTotal.text(formattedTotal)
 
         // total cart price
-        let totalCartPriceText = $(`${layoutContainer} .total-cart-price`);
+        let totalCartPriceText = $(`.cart-items .total-cart-price`);
         let cartPriceInUnit = extraNumericValue(totalCartPriceText.text());
 
         let cartTotalPrice = cartPriceInUnit + (pricePerUnit * count);
@@ -94,21 +100,21 @@ function removeFromCart(cartId, productId) {
       method: 'post',
       success: (response) => {
         if (response.status) {
-          let isMobile = window.innerWidth < 768;
-          let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
+          // let isMobile = window.innerWidth < 768;
+          // let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
 
           //for updating cart header count
-          let qtySpan = $(`${layoutContainer} .product-qty[data-product-id="${productId}"]`);
+          let qtySpan = $(`.cart-items .product-qty[data-product-id="${productId}"]`);
           let currentQty = extraNumericValue(qtySpan.text());
           let cartHeaderQty = parseInt($(`#cart-count-header`).text());
           let newCartQty = cartHeaderQty - currentQty;
           $('#cart-count-header').text(newCartQty);
 
           //updating current cartTotal
-          let productTotal = $(`${layoutContainer} .product-total[data-product-id="${productId}"]`).text()
+          let productTotal = $(`.cart-items .product-total[data-product-id="${productId}"]`).text()
           let productTotalUnit = extraNumericValue(productTotal);
 
-          let cartTotal = $(`${layoutContainer} .total-cart-price`).text();
+          let cartTotal = $(`.cart-items .total-cart-price`).text();
           let cartTotalUnit = extraNumericValue(cartTotal);
 
           let currentCartTotalPrice = cartTotalUnit - productTotalUnit;
@@ -117,11 +123,11 @@ function removeFromCart(cartId, productId) {
           $('.total-cart-price').text(formattedCartTotal)
 
           //remove from cart when click
-          $(`${layoutContainer} .cart-item[data-product-id="${productId}"]`).remove()
+          $(`.cart-items .cart-item[data-product-id="${productId}"]`).remove()
 
           // Check if any cart items remain
-          if ($(`${layoutContainer} .cart-item`).length === 0) {
-            $(`${layoutContainer}`).html(`
+          if ($(`.cart-items .cart-item`).length === 0) {
+            $(`.cart-items`).html(`
           <div class="alert alert-info text-center">
             Your cart is empty. <a href="/">Start Shopping</a>
           </div>

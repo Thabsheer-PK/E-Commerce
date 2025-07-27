@@ -1,14 +1,47 @@
-*{
+* {
   box-sizing: border-box;
 }
+
 .dropdown-menu {
   right: 0 !important;
   left: auto !important;
 }
-.product-section{
+
+.product-section {
   margin-top: -1rem;
 }
 
-td,tr,th{
+td,
+tr,
+th {
   vertical-align: middle !important;
+}
+
+.cart-message {
+  margin-top: -0.9rem;
+  opacity: 0;
+}
+
+#price {
+  margin-top: -0.7rem;
+}
+
+.cart-added-message {
+  opacity: 1;
+}
+
+.addCartBtn {
+  background-color: #ffa41c !important;
+  border: none !important;
+  color: black !important;
+  font-weight: 500 !important;
+  width: 100% !important;
+  border-radius: 100px !important;
+}
+
+.placeOderBtn {
+  background-color: #fb641b !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 100px !important;
 }
