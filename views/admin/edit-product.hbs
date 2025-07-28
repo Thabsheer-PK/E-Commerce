@@ -1,51 +1,73 @@
-<section>
+<section class="py-5">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <h2 class="text-center mt-3">Edit Product</h2>
-        <form action="/admin/edit-product/{{product._id}}" method="post" enctype="multipart/form-data">
-          <div class="form-group">
-            <label for="inputForName">Name</label>
-            <input id="inputForName" type="text" class="form-control" name='Name' required placeholder="Enter Product Name" value="{{product.Name}}">
-          </div>
-          <div class="form-group">
-            <label for="inputForCategory">Category</label>
-            <input id="inputForCategory" type="text" class="form-control" name='Category' required placeholder="Enter Product Category" value="{{product.Category}}">
-          </div>
-          <div class="form-group">
-            <label for="inputForPrice">Price</label>
-            <input id="inputForPrice" type="text" class="form-control" name='Price' required placeholder="Enter Product Price" value="{{product.Price}}">
-          </div>
-          <div class="form-group">
-            <label for="inputForDescription">Description</label>
-            <input id="inputForDescription" type="text" class="form-control" name='Description' required placeholder="Enter Product Description" value="{{product.Description}}">
-          </div>
-          <div class="form-group">
-           <label for="">Image</label>
-            <img src="/product-images/{{product._id}}.jpg" style="width: 100px; height:auto" alt="" id="viewImage">
-          </div>
-          <div class="form-group">
-            <label for="inputForimage">Upload Product Image</label>
-            <input id="inputForimage" type="file" class="form-control" name='Image' required>
-          </div>
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow rounded-4">
+          <div class="card-body p-4">
+            <h3 class="text-center mb-4">✏️ Edit Product</h3>
 
-          <button type="submit" class="btn btn-success mt-2">Submit</button>
+            <form action="/admin/edit-product/{{product._id}}" method="post" enctype="multipart/form-data">
+              <!-- Name -->
+              <div class="mb-3">
+                <label for="inputForName" class="form-label">Product Name</label>
+                <input id="inputForName" type="text" class="form-control" name="Name" required
+                  placeholder="Enter Product Name" value="{{product.Name}}">
+              </div>
 
-        </form>
+              <!-- Category -->
+              <div class="mb-3">
+                <label for="inputForCategory" class="form-label">Category</label>
+                <input id="inputForCategory" type="text" class="form-control" name="Category" required
+                  placeholder="Enter Product Category" value="{{product.Category}}">
+              </div>
+
+              <!-- Price -->
+              <div class="mb-3">
+                <label for="inputForPrice" class="form-label">Price (₹)</label>
+                <input id="inputForPrice" type="number" class="form-control" name="Price" required
+                  placeholder="Enter Product Price" value="{{product.Price}}" min="1">
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <label for="inputForDescription" class="form-label">Description</label>
+                <textarea id="inputForDescription" class="form-control" name="Description" rows="3"
+                  placeholder="Enter Product Description" required>{{product.Description}}</textarea>
+              </div>
+
+              <!-- Current Image -->
+              <div class="mb-3 text-center">
+                <label class="form-label">Current Image</label><br>
+                <img src="/product-images/{{product._id}}.jpg" id="viewImage" class="img-thumbnail rounded-3"
+                  style="width: 120px;">
+              </div>
+
+              <!-- Upload New Image -->
+              <div class="mb-3">
+                <label for="inputForimage" class="form-label">Upload New Image</label>
+                <input id="inputForimage" type="file" class="form-control" name="Image" required>
+              </div>
+
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-success rounded-pill">💾 Update Product</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Live Preview Script -->
 <script>
-  document.getElementById('inputForimage').addEventListener('change',(event)=>{
+  document.getElementById('inputForimage').addEventListener('change', (event) => {
     const file = event.target.files[0];
-    if(file){
+    if (file) {
       const image = document.getElementById('viewImage');
       image.src = URL.createObjectURL(file);
-      image.onload = ()=>{
-        URL.revokeObjectURL(image.src) // // this remove temperory object url after image change
-      }
+      image.onload = () => URL.revokeObjectURL(image.src); // Clean up temp URL
     }
-  })
+  });
 </script>

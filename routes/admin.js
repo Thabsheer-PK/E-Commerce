@@ -31,7 +31,7 @@ router.get('/deleteProduct/:id', (req, res, next) => {
 
 router.get('/editProduct/:id', async (req, res, next) => {
   let product = await adminHelpers.getProductDetails(req.params.id)
-  res.render('admin/edit-product', { product });
+  res.render('admin/edit-product', { product, admin: true });
 })
 
 router.post('/edit-product/:id', async (req, res) => {
@@ -39,15 +39,19 @@ router.post('/edit-product/:id', async (req, res) => {
     let id = req.params.id;
     if (req.files.Image) {
       let image = req.files.Image;
-      image.mv('./public/product-images/'+id+'.jpg',(err)=>{
-        if(err){
+      image.mv('./public/product-images/' + id + '.jpg', (err) => {
+        if (err) {
           console.log('uploading image error');
-        }else{
+        } else {
           res.redirect('/admin/')
         }
       })
     }
   })
+})
+
+router.get('/orders',(req,res,next)=>{
+  
 })
 
 module.exports = router;

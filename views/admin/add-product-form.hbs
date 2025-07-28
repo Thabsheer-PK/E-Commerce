@@ -1,50 +1,78 @@
-<section>
+<section class="py-5">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <h2 class="text-center mt-3">Add Product</h2>
-        <form action="/admin/add-product" method="post" enctype="multipart/form-data">
-          <div class="form-group">
-            <label for="inputForName">Name</label>
-            <input id="inputForName" type="text" class="form-control" name='Name' required placeholder="Enter Product Name">
-          </div>
-          <div class="form-group">
-            <label for="inputForCategory">Category</label>
-            <input id="inputForCategory" type="text" class="form-control" name='Category' required placeholder="Enter Product Category">
-          </div>
-          <div class="form-group">
-            <label for="inputForPrice">Price</label>
-            <input id="inputForPrice" type="text" class="form-control" name='Price' required placeholder="Enter Product Price">
-          </div>
-          <div class="form-group">
-            <label for="inputForDescription">Description</label>
-            <input id="inputForDescription" type="text" class="form-control" name='Description' required placeholder="Enter Product Description">
-          </div>
-          <div class="form-group">
-            <label for="inputForimage">Upload Product Image</label>
-            <input id="inputForimage" type="file" required class="form-control" name='Image'>
-          </div>
-          <div>
-            <img src="" id="viewImage" style="width: 100px;" alt="">
-          </div>
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow rounded-4">
+          <div class="card-body p-4">
+            <h3 class="text-center mb-4">➕ Add New Product</h3>
 
-          <button type="submit" class="btn btn-success mt-2">Submit</button>
+            <form action="/admin/add-product" method="post" enctype="multipart/form-data">
+              <!-- Name -->
+              <div class="mb-3">
+                <label for="inputForName" class="form-label">Product Name</label>
+                <input id="inputForName" type="text" class="form-control" name="Name" required
+                  placeholder="Enter Product Name">
+              </div>
 
-        </form>
+              <!-- Category -->
+              <div class="mb-3">
+                <label for="inputForCategory" class="form-label">Category</label>
+                <input id="inputForCategory" type="text" class="form-control" name="Category" required
+                  placeholder="Enter Product Category">
+              </div>
+
+              <!-- Price -->
+              <div class="mb-3">
+                <label for="inputForPrice" class="form-label">Price (₹)</label>
+                <input id="inputForPrice" type="number" class="form-control" name="Price" required
+                  placeholder="Enter Product Price" min="1">
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <label for="inputForDescription" class="form-label">Description</label>
+                <textarea id="inputForDescription" class="form-control" name="Description" rows="3" required
+                  placeholder="Enter Product Description"></textarea>
+              </div>
+
+              <!-- Image Upload -->
+              <div class="mb-3">
+                <label for="inputForimage" class="form-label">Upload Product Image</label>
+                <input id="inputForimage" type="file" required class="form-control" name="Image" accept="image/*">
+              </div>
+
+              <!-- Live Preview -->
+              <div class="text-center mb-3">
+                <img src="" id="viewImage" class="img-thumbnail rounded-3" style="width: 120px; display: none;"
+                  alt="Preview">
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-success rounded-pill">📦 Add Product</button>
+              </div>
+
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Live Image Preview -->
 <script>
-  document.getElementById('inputForimage').addEventListener('change',(event)=>{
+  document.getElementById('inputForimage').addEventListener('change', (event) => {
     const file = event.target.files[0];
-    if(file){
-      const image = document.getElementById('viewImage');
+    const image = document.getElementById('viewImage');
+    if (file) {
+      image.style.display = 'block';
       image.src = URL.createObjectURL(file);
-      image.onload = ()=>{
-        URL.revokeObjectURL(image.src) // // this remove temperory object url after image change
-      }
+      image.onload = () => {
+        URL.revokeObjectURL(image.src);
+      };
+    } else {
+      image.style.display = 'none';
     }
-  })
+  });
 </script>

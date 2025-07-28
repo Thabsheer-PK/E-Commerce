@@ -8,18 +8,17 @@
             <img src="/product-images/{{this._id}}.jpg" alt="{{this.Name}}" class="img-fluid"
               style="height: 200px; object-fit:contain">
           </div>
-          <div class="card-body">
+          <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{this.Name}}</h5>
             <p class="card-text">{{this.Description}}</p>
             <p class="card-text font-weight-bold" id="price">{{priceFormat this.Price}}</p>
-            <div class="cart-message d-flex align-items-center" data-product-id="{{this._id}}">
-              <img src="images/icons/checkmark.png" alt="" style="height: 20px;">
-              <span class="text-success fw-bold ml-1">Added</span>
+            <div class="mt-auto">
+              <div class="cart-message d-flex align-items-center mb-2" data-product-id="{{this._id}}">
+                <img src="images/icons/checkmark.png" alt="" style="height: 20px;">
+                <span class="text-success fw-bold ms-1">Added</span>
+              </div>
+              <button class="btn addCartBtn w-100" onclick="addToCartBtnAjax('{{this._id}}')">Add to Cart</button>
             </div>
-            <div class="mt-2">
-              <button class="btn addCartBtn" onclick="addToCartBtnAjax('{{this._id}}')">Add to Cart</button>
-            </div>
-
           </div>
         </div>
       </div>
