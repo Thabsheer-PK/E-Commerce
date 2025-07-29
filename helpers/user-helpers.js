@@ -7,6 +7,7 @@ const razorpayInstance = new Razorpay({
   key_id: 'rzp_test_FXNzEBflDxqzt7',
   key_secret: 'an8yyUbjekvrxiONEnmJDJkX',
 });
+const crypto = require('crypto')
 
 module.exports = {
   doSignup: (userData) => {
@@ -493,10 +494,10 @@ module.exports = {
         payment_capture: 1,
       };
       razorpayInstance.orders.create(options, (err, order) => {
-        if(err){
+        if (err) {
           reject(err);
-        }else{
-          console.log('new order',order);
+        } else {
+          console.log('new order', order);
           resolve(order)
         }
       })
@@ -519,5 +520,43 @@ module.exports = {
       resolve(grandTotal)
     })
 
+  },
+  changePaymentStatus: async (orderId) => {
+    await getDB().collection(collection.ORDER_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(orderId)
+      }, {
+      $set: {
+        status: 'Paid'
+      }
+    }
+    )
+  },
+  verifyPayment: (details) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+          order_id
+        } = details;
+
+        const hmac = crypto.createHmac('sha256', 'an8yyUbjekvrxiONEnmJDJkX')
+        hmac.update(razorpay_order_id + "|" + razorpay_payment_id)
+        const generatdSignature = hmac.digest('hex');
+        if (generatdSignature === razorpay_signature) {
+          //payment is verified
+          //save payment info to DB
+          await changePaymentStatus(order_id)
+          res.json({ status: true })
+        } else {
+          res.status(400).json({ status: false, message: 'invalid signature' })
+        }
+      } catch (err) {
+        console.log('verifiction failed', err);
+      }
+    })
   }
 }
+

@@ -5,6 +5,7 @@ const { getDB } = require('../config/connect');
 const collections = require('../config/collections');
 var router = express.Router();
 const session = require('express-session');
+const crypto = require('crypto')
 
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
   if (req.session.Loggedin) {
@@ -141,7 +142,6 @@ router.get('/place-order-form', async (req, res, next) => {
 })
 
 router.post('/place-order', async (req, res, next) => {
-  console.log('place order hit');
   let orderItems = await userHelpers.getOrderedCartList(req.session.user._id, req.body.productIds)
   userHelpers.placeOrder(req.body, orderItems).then(async (response) => {
     let orderId = response.insertedId.toString()
@@ -150,11 +150,8 @@ router.post('/place-order', async (req, res, next) => {
       res.json({ codSuccess: true })
     } else {
       const razorpayOrder = await userHelpers.generateRazorpay(orderId, totalAmount)
-      res.json({
-        razorpayOrder
-      })
+      res.json({ razorpayOrder })
     }
-
   })
 })
 
@@ -188,6 +185,32 @@ router.get('/profile', async (req, res, next) => {
   let cartQty = await userHelpers.getCartQuantity(user._id);
   let orders = await userHelpers.getOrderDetails(user._id)
   res.render('user/profile', { user, cartQty, orders })
+})
+
+router.post('/verify-payment', async (req, res, next) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      order_id
+    } = req.body;
+
+    const hmac = crypto.createHmac('sha256', 'an8yyUbjekvrxiONEnmJDJkX')
+    hmac.update(razorpay_order_id + "|" + razorpay_payment_id)
+    const generatdSignature = hmac.digest('hex');
+    if (generatdSignature === razorpay_signature) {
+      console.log('payment veified');
+      //payment is verified
+      //save payment info to DB
+      await userHelpers.changePaymentStatus(order_id)
+      res.json({ status: true })
+    } else {
+      res.status(400).json({ status: false, message: 'invalid signature' })
+    }
+  } catch (err) {
+    console.log('verifiction failed', err);
+  }
 })
 
 module.exports = router;

@@ -4,7 +4,6 @@ $(document).ready(function () {
     e.preventDefault();
 
     let formData = $(this).serializeArray();
-    console.log("Form data:", formData);
 
     $.ajax({
       url: '/place-order',
@@ -18,7 +17,7 @@ $(document).ready(function () {
         }
       },
       error: (xhr, status, err) => {
-        console.error(" AJAX error:", status, err);
+        console.error("AJAX ERROR:");
       }
     });
   });
@@ -34,9 +33,8 @@ function razorpayPayment(order) {
     "description": "Test Transaction",
     "image": "https://example.com/your_logo",
     "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
-    "helpers": {
-
+    "handler": function (response) {
+      verifyPayment(response, order)
     },
     "prefill": {
       "name": "Gaurav Kumar",
@@ -52,4 +50,28 @@ function razorpayPayment(order) {
   };
   let rzp = new Razorpay(options)
   rzp.open()
+}
+
+function verifyPayment(payment, order) {
+  $.ajax({
+    url: 'verify-payment',
+    method: 'post',
+    data: {
+      razorpay_order_id: order.id,
+      razorpay_payment_id: payment.razorpay_payment_id,
+      razorpay_signature: payment.razorpay_signature,
+      order_id: order.receipt
+    },
+    success: (response) => {
+      if (response.status) {
+
+        window.location.href = '/order-success';
+      } else {
+        alert('payment verification failed')
+      }
+    },
+    error: () => {
+      alert('Server error during verification');
+    }
+  })
 }
