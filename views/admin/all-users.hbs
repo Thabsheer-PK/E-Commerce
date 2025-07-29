@@ -1,0 +1,21 @@
+<section class="container my-5">
+  <h2 class="text-center mb-4">👥 All Users</h2>
+
+  {{#if users.length}}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+      {{#each users}}
+        <div class="col">
+          <div class="card shadow-sm p-3">
+            <h5 class="mb-1">{{this.Name}}</h5>
+            <p class="mb-1">📧 {{this.Email}}</p>
+            <p class="mb-0">📞 {{this.Mobile}}</p>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="alert alert-warning text-center">
+      ❌ No users found.
+    </div>
+  {{/if}}
+</section>

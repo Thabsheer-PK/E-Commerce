@@ -1,6 +1,6 @@
 const { getDB } = require('../config/connect')
 const collection = require('../config/collections')
-const { ObjectId } = require('mongodb');
+const { ObjectId, LEGAL_TCP_SOCKET_OPTIONS } = require('mongodb');
 
 module.exports = {
   addProduct: async (product) => {
@@ -48,5 +48,32 @@ module.exports = {
         resolve(response);
       })
     })
+  },
+  getAllOrderes: () => {
+    return new Promise(async (resolve, reject) => {
+      let orders = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+        {
+          $lookup: {
+            from: collection.USER_COLLECTION,
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userDetails'
+          }
+        }, {
+          $unwind: '$userDetails'
+        }
+
+      ]).toArray();
+      resolve(orders)
+    })
+  },
+  getAllUsers: () => {
+    return new Promise(async (resolve, reject) => {
+      let users = await getDB().collection(collection.USER_COLLECTION).find().toArray();
+      console.log(users);
+      resolve(users)
+
+    })
   }
+
 }
