@@ -141,10 +141,20 @@ router.get('/place-order-form', async (req, res, next) => {
 })
 
 router.post('/place-order', async (req, res, next) => {
-  let orderItems = await userHelpers.getOrderedCarttList(req.session.user._id, req.body.productIds)
+  console.log('place order hit');
+  let orderItems = await userHelpers.getOrderedCartList(req.session.user._id, req.body.productIds)
+  userHelpers.placeOrder(req.body, orderItems).then(async (response) => {
+    let orderId = response.insertedId.toString()
+    let totalAmount = await userHelpers.getOrderAmount(orderId);
+    if (req.body.paymentMethod === 'COD') {
+      res.json({ codSuccess: true })
+    } else {
+      const razorpayOrder = await userHelpers.generateRazorpay(orderId, totalAmount)
+      res.json({
+        razorpayOrder
+      })
+    }
 
-  userHelpers.placeOrder(req.body, orderItems).then((response) => {
-    res.json({ status: true })
   })
 })
 

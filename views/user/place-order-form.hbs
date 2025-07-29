@@ -1,5 +1,5 @@
 <section class="mt-5">
-  <form action="/submit-order" id="orderForm" method="POST">
+  <form action="/place-order" id="orderForm" method="POST">
     <div class="container">
       <h2 class="mb-4">Place Order</h2>
       <!-- ORDERED PRODUCTS TABLE -->
@@ -28,7 +28,7 @@
               <td>{{multiplyAndFormat this.quantity this.product.Price}}</td>
 
               <input type="hidden" name="productIds" value="{{this.product._id}}">
-              
+
             </tr>
             {{/each}}
           </tbody>
@@ -37,7 +37,7 @@
         <h4 class="text-end">Grand Total: {{priceFormat grandTotal}}</h4>
         <input type="hidden" name="grandTotal" value="{{grandTotal
         }}">
-        
+
       </div>
 
       <!-- CUSTOMER & ADDRESS DETAILS -->

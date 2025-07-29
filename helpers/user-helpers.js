@@ -2,6 +2,11 @@ const { getDB } = require('../config/connect');
 const collection = require('../config/collections');
 const bcrypt = require('bcrypt');
 const { ObjectId } = require('mongodb');
+const Razorpay = require('razorpay');
+const razorpayInstance = new Razorpay({
+  key_id: 'rzp_test_FXNzEBflDxqzt7',
+  key_secret: 'an8yyUbjekvrxiONEnmJDJkX',
+});
 
 module.exports = {
   doSignup: (userData) => {
@@ -285,7 +290,6 @@ module.exports = {
         { $inc: { seq: 1 } },
         { returnDocument: 'after', upsert: true } //returnDocAfter-counter have updated value, upsert-create collection and insert document if counters collection does't exist
       )
-      console.log(counter);
       let orderNumber = `ORD00${counter.seq}`
 
       let orderObj = {
@@ -306,7 +310,6 @@ module.exports = {
         status: status
       }
       let orderDatas = await getDB().collection(collection.ORDER_COLLECTION).insertOne(orderObj)
-      console.log(orderDatas);
 
       let userId = userOrderDetails.userId
       if (!Array.isArray(userOrderDetails.productIds)) {
@@ -327,7 +330,7 @@ module.exports = {
       resolve(orderDatas);
     })
   },
-  getOrderedCarttList: (userId, productIds) => {
+  getOrderedCartList: (userId, productIds) => {
     return new Promise(async (resolve, reject) => {
       if (!Array.isArray(productIds)) { //not in array format, so only one product 
         let orderProduct = await getDB().collection(collection.CART_COLLECTION).aggregate([
@@ -422,8 +425,6 @@ module.exports = {
   },
   getViewOrderProducts: (userID, orderId) => {
     return new Promise(async (resolve, reject) => {
-      console.log('userID', userID);
-      console.log('orderId', orderId);
       let orderProducts = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
         {
           $match: {
@@ -441,7 +442,7 @@ module.exports = {
           }
         }, {
           $unwind: '$productDetails'
-        } , {
+        }, {
           $addFields: {
             'OrderProducts.products.productInfo': '$productDetails'
           }
@@ -482,5 +483,41 @@ module.exports = {
       ]).toArray();
       resolve(orderProducts);
     })
+  },
+  generateRazorpay: (orderId, totalAmount) => {
+    return new Promise((resolve, reject) => {
+      const options = {
+        amount: totalAmount * 100,
+        currency: "INR",
+        receipt: orderId,
+        payment_capture: 1,
+      };
+      razorpayInstance.orders.create(options, (err, order) => {
+        if(err){
+          reject(err);
+        }else{
+          console.log('new order',order);
+          resolve(order)
+        }
+      })
+    })
+  },
+  getOrderAmount: (orderId) => {
+    return new Promise(async (resolve, reject) => {
+      let total = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+        {
+          $match: {
+            _id: new ObjectId(orderId)
+          }
+        }, {
+          $project: {
+            grandTotal: 1
+          }
+        }
+      ]).toArray()
+      let grandTotal = Number(total[0].grandTotal)
+      resolve(grandTotal)
+    })
+
   }
 }
