@@ -1,6 +1,24 @@
 const { getDB } = require('../config/connect')
 const collection = require('../config/collections')
 const { ObjectId, LEGAL_TCP_SOCKET_OPTIONS } = require('mongodb');
+let bcrypt = require('bcrypt');
+
+createAdmin();
+async function createAdmin() {
+  console.log('in create admin');
+  let hashedPass = await bcrypt.hash('admin123', 10)
+  let existing = await getDB().collection('admin').findOne({
+    username: 'admin'
+  })
+  if (!existing) {
+    let admin = await getDB().collection('admin').insertOne({
+      username: 'admin',
+      password: hashedPass
+    })
+    console.log('admin created ', admin);
+  }
+
+}
 
 module.exports = {
   addProduct: async (product) => {
@@ -72,6 +90,24 @@ module.exports = {
       let users = await getDB().collection(collection.USER_COLLECTION).find().toArray();
       console.log(users);
       resolve(users)
+
+    })
+  },
+
+  doAdminLogin: (details) => {
+    console.log('in details ',details);
+    return new Promise(async (resolve, reject) => {
+      let admin = await getDB().collection('admin').findOne({ username: details.username });
+      console.log('admin collection',admin);
+      if (!admin) {
+        resolve({ status: false, message: 'Admin not found' })
+      }
+      let match = await bcrypt.compare(details.password, admin.password)
+      if (match) {
+        resolve({ status: true, admin })
+      } else {
+        resolve({ staus: false, message: 'password incorrect' })
+      }
 
     })
   }

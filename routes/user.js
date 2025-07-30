@@ -8,7 +8,7 @@ const session = require('express-session');
 const crypto = require('crypto')
 
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
-  if (req.session.Loggedin) {
+  if (req.session.user && req.session.user.Loggedin) {
     next();
   } else {
     res.redirect('/login')
@@ -48,33 +48,34 @@ router.get('/', async function (req, res, next) {
 
 router.get('/login', (req, res, next) => {
   res.set('Cache-Control', 'no-store'); //no cache stored in browser
-  if (req.session.Loggedin) {
+  console.log(req.session.user);
+  if (req.session.user && req.session.user.Loggedin) {
     res.redirect('/');
   } else {
-    res.render('user/login', { loginErr: req.session.loginErr })
+    res.render('user/login', { loginErr: req.session.userLoginErr })
   }
 
 })
 router.post('/login', (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
     if (response.status) {
-      req.session.Loggedin = true;
       req.session.user = response.user;
+      req.session.user.Loggedin = true;
       res.redirect('/');
     } else {
-      req.session.loginErr = "inavlid username or password";
+      req.session.userLoginErr = "inavlid username or password";
       res.redirect('/login');
     }
   })
 })
 router.get('/logout', (req, res, next) => {
-  req.session.destroy();
+  req.session.user = null;
   res.redirect('/')
 })
 
 router.get('/signup', (req, res, next) => {
   res.set('Cache-Control', 'no-store'); //no cache stored in browser
-  if (req.session.Loggedin) {
+  if (req.session.user && req.session.user.Loggedin) {
     res.redirect('/')
   } else {
     res.render('user/signup')
@@ -83,8 +84,9 @@ router.get('/signup', (req, res, next) => {
 })
 router.post('/signup', (req, res, next) => {
   userHelpers.doSignup(req.body).then((user) => {
-    req.session.Loggedin = true;
     req.session.user = user;
+    req.session.user.Loggedin = true;
+    
     res.redirect('/');
   })
 
@@ -188,29 +190,10 @@ router.get('/profile', async (req, res, next) => {
 })
 
 router.post('/verify-payment', async (req, res, next) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      order_id
-    } = req.body;
+  userHelpers.verifyPayment(req.body).then(()=>{
 
-    const hmac = crypto.createHmac('sha256', 'an8yyUbjekvrxiONEnmJDJkX')
-    hmac.update(razorpay_order_id + "|" + razorpay_payment_id)
-    const generatdSignature = hmac.digest('hex');
-    if (generatdSignature === razorpay_signature) {
-      console.log('payment veified');
-      //payment is verified
-      //save payment info to DB
-      await userHelpers.changePaymentStatus(order_id)
-      res.json({ status: true })
-    } else {
-      res.status(400).json({ status: false, message: 'invalid signature' })
-    }
-  } catch (err) {
-    console.log('verifiction failed', err);
-  }
+  })
+  
 })
 
 module.exports = router;

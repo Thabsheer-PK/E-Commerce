@@ -1,0 +1,43 @@
+<section class="d-flex align-items-center bg-light with-header">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-4">
+            <h3 class="mb-4 text-center text-danger">Admin Login</h3>
+
+            <form action="/admin/login" method="post" id="adminLoginForm" novalidate>
+              <div class="mb-3">
+                <label for="adminName" class="form-label">Username</label>
+                <input type="text" class="form-control" id="adminName" name="username" required
+                  placeholder="Enter admin name">
+              </div>
+
+              <div class="mb-3">
+                <label for="adminPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="adminPassword" name="password" required
+                  placeholder="Your admin password">
+                <div class="invalid-feedback">Please enter your password.</div>
+              </div>
+
+              <!-- Login error -->
+              {{#if loginErr}}
+              <p class="text-danger text-center small">{{loginErr}}</p>
+              {{/if}}
+
+              <!-- Submit -->
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-danger">Login</button>
+              </div>
+
+              <!-- Optional: Back to user -->
+              <div class="text-center mt-3">
+                <a href="/login" class="text-decoration-none small">Login as User</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
