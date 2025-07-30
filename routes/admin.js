@@ -3,6 +3,7 @@ var router = express.Router();
 const { getDB } = require('../config/connect');
 const adminHelpers = require('../helpers/admin-helpers');
 const { doLogin } = require('../helpers/user-helpers');
+
 const verifyAdmin = (req, res, next) => {
   if (req.session.adminloggedIn) {
     next();
@@ -12,27 +13,36 @@ const verifyAdmin = (req, res, next) => {
 }
 
 router.get('/login', async (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
   if (req.session.admin) {
     res.redirect('/admin')
   } else {
-    res.render('admin/login', { admin: true, loginErr: req.session.adminLoginErr })
-    req.session.adminLoginErr = null;
+    res.render('admin/login')
   }
 
 })
 
 router.post('/login', async (req, res, next) => {
-  adminHelpers.doAdminLogin(req.body).then((response) => {
-    console.log(response);
-    if (response.status) {
-      req.session.admin = response.admin;
-      req.session.adminloggedIn = true;
-      res.redirect('/admin/')
-    } else {
-      req.session.adminLoginErr = response.message;
-      res.redirect('/admin/login')
-    }
-  })
+  let { username, password } = req.body;
+  let missingField = [];
+  if (!username) missingField.push('Username')
+  if (!password) missingField.push('Password')
+  if (missingField.length > 0) {
+    res.json({ status: false, message: `Please Enter ${missingField.join(" and ")}` })
+  }
+  if (missingField.length === 0) {
+    adminHelpers.doAdminLogin(req.body).then((response) => {
+      console.log(response);
+      if (response.status) {
+        req.session.admin = response.admin;
+        req.session.adminloggedIn = true;
+        res.json({ status: true })
+      } else {
+        res.json({ status: false, message: response.message })
+      }
+    })
+  }
+
 })
 router.get('/admin-logout', (req, res, next) => {
   req.session.admin = null;
@@ -40,6 +50,7 @@ router.get('/admin-logout', (req, res, next) => {
 })
 
 router.get('/', verifyAdmin, function (req, res, next) {
+   res.set('Cache-Control', 'no-store');
   if (req.session.admin) {
     adminHelpers.getAllProducts().then((products) => {
       res.render('admin/view-products', { admin: true, products })

@@ -1,4 +1,4 @@
-<section class="d-flex align-items-center bg-light with-header">
+<section class="d-flex align-items-center bg-light" style="min-height: 100vh;">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
@@ -6,7 +6,7 @@
           <div class="card-body p-4">
             <h3 class="mb-4 text-center text-danger">Admin Login</h3>
 
-            <form action="/admin/login" method="post" id="adminLoginForm" novalidate>
+            <form id="adminLoginForm" novalidate>
               <div class="mb-3">
                 <label for="adminName" class="form-label">Username</label>
                 <input type="text" class="form-control" id="adminName" name="username" required
@@ -20,17 +20,12 @@
                 <div class="invalid-feedback">Please enter your password.</div>
               </div>
 
-              <!-- Login error -->
-              {{#if loginErr}}
-              <p class="text-danger text-center small">{{loginErr}}</p>
-              {{/if}}
+              <p class="text-danger text-center small" id="loginErr"></p>
 
-              <!-- Submit -->
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-danger">Login</button>
               </div>
 
-              <!-- Optional: Back to user -->
               <div class="text-center mt-3">
                 <a href="/login" class="text-decoration-none small">Login as User</a>
               </div>

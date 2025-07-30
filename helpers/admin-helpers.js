@@ -98,15 +98,14 @@ module.exports = {
     console.log('in details ',details);
     return new Promise(async (resolve, reject) => {
       let admin = await getDB().collection('admin').findOne({ username: details.username });
-      console.log('admin collection',admin);
       if (!admin) {
-        resolve({ status: false, message: 'Admin not found' })
+       return resolve({ status: false, message: 'Admin not found' })
       }
       let match = await bcrypt.compare(details.password, admin.password)
       if (match) {
         resolve({ status: true, admin })
       } else {
-        resolve({ staus: false, message: 'password incorrect' })
+        resolve({ staus: false, message: 'Incorrect Password' })
       }
 
     })

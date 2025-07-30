@@ -89,8 +89,6 @@ function changeProductQty(cartId, productId, count) {
 
 function removeFromCart(cartId, productId) {
   if (confirm("Are you sure you want to remove this product from your cart?")) {
-
-
     $.ajax({
       url: '/remove-from-cart',
       data: {
@@ -133,11 +131,35 @@ function removeFromCart(cartId, productId) {
           </div>
           `);
           }
-
-
         }
-
       }
     })
   }
 }
+
+$(document).ready(function () {
+  $('#adminLoginForm').submit(function (e) {
+    e.preventDefault();
+    let formData = {};
+    //convert into object
+    $(this).serializeArray().forEach((field) => {
+      formData[field.name] = field.value
+    })
+    console.log('form data',formData);
+    $.ajax({
+      url: '/admin/login',
+      data: formData,
+      method: 'post',
+      success: (response) => {
+        if(response.status){
+          window.location.href = '/admin'
+        }else{
+          $('#loginErr').text(response.message)
+        }
+        
+      }
+    })
+  })
+})
+
+
