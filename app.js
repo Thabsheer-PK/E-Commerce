@@ -46,6 +46,16 @@ app.engine('hbs', exphbs.engine({
     },
     capitalize: (data)=>{
       return data.toUpperCase();
+    },
+    getStatusColor: (status)=>{
+      switch (status){
+        case 'placed': 
+        return 'bg-dark'
+        case 'pending':
+        return 'bg-danger'
+        default: 
+        return 'bg-primary'
+      }
     }
   }
 }))

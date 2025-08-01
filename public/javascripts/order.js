@@ -11,7 +11,7 @@ $(document).ready(function () {
       data: formData,
       success: (response) => {
         if (response.codSuccess) {
-          window.location.href = '/order-success';
+          window.location.href = '/order-result';
         } else {
           razorpayPayment(response.razorpayOrder);
         }
@@ -35,6 +35,11 @@ function razorpayPayment(order) {
     "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
     "handler": function (response) {
       verifyPayment(response, order)
+    },
+    "modal":{
+      "ondismiss": function () {
+        window.location.href='/order-result?status=failed'
+      }
     },
     "prefill": {
       "name": "Gaurav Kumar",
@@ -64,10 +69,7 @@ function verifyPayment(payment, order) {
     },
     success: (response) => {
       if (response.status) {
-
-        window.location.href = '/order-success';
-      } else {
-        alert('payment verification failed')
+        window.location.href = '/order-result';
       }
     },
     error: () => {

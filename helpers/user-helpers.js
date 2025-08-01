@@ -550,7 +550,7 @@ module.exports = {
         _id: new ObjectId(orderId)
       }, {
       $set: {
-        status: 'Paid'
+        status: 'placed'
       }
     }
     )
@@ -572,7 +572,7 @@ module.exports = {
           //payment is verified
           //save payment info to DB
           await changePaymentStatus(order_id)
-          res.json({ status: true })
+          resolve({status:true})
         } else {
           res.status(400).json({ status: false, message: 'invalid signature' })
         }

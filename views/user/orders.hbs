@@ -2,67 +2,67 @@
   <h2 class="mb-4">🛒 My Orders</h2>
 
   {{#if orders.length}}
-    {{#each orders as |order|}}
-      <div class="card mb-4 shadow-lg">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <strong>Order ID:</strong> {{this.orderNumber}}
+  {{#each orders as |order|}}
+  <div class="card mb-4 shadow-lg">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Order ID:</strong> {{this.orderNumber}}
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 my-auto">
+          <p><strong>Ordered On:</strong> {{formatDate this.date}}</p>
+          <p><strong>Payment Method:</strong> {{this.paymentMethod}}</p>
+          <p><strong>Grand Total:</strong> {{priceFormat this.grandTotal}}</p>
+          <p><strong>Order Status:</strong><span class="badge rounded-pill {{getStatusColor this.status}} ml-2">
+              {{capitalize this.status}}</span></p>
         </div>
 
-        <div class="card-body">
-          <div class="row">
-            <!-- Order Summary -->
-            <div class="col-md-6 my-auto">
-              <p><strong>Ordered On:</strong> {{formatDate this.date}}</p>
-              <p><strong>Payment Method:</strong> {{this.paymentMethod}}</p>
-              <p><strong>Grand Total:</strong> {{priceFormat this.grandTotal}}</p>
-            </div>
-
-            <!-- Delivery Address -->
-            <div class="col-md-6 border-start ps-5 my-auto">
-              <h5>Delivery Address</h5>
-              <p class="mb-1">{{this.delivaryAddress.name}}</p>
-              <p class="mb-1">{{this.delivaryAddress.addressLine}}</p>
-              <p class="mb-1">{{this.delivaryAddress.city}} - {{this.delivaryAddress.pincode}}</p>
-              <p class="mb-0">{{this.delivaryAddress.mobile}}</p>
-            </div>
-          </div>
-
-          <hr>
-
-          <!-- Ordered Items Table -->
-          <h5>Items Ordered</h5>
-          <table class="table table-sm table-bordered mt-3">
-            <thead class="table-light text-center">
-              <tr>
-                <th>#</th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each this.OrderProducts.products}}
-                <tr class="text-center align-middle">
-                  <td>{{inc @index}}</td>
-                  <td>
-                    <img src="/product-images/{{this.productInfo._id}}.jpg" alt="" width="70">
-                  </td>
-                  <td>{{this.productInfo.Name}}</td>
-                  <td>{{this.quantity}}</td>
-                  {{#if @first}}
-                    <td rowspan="{{../OrderProducts.products.length}}">
-                      <a href="/ordered-products?orderId={{order._id}}" class="btn btn-outline-success m-2">View Details</a>
-                    </td>
-                  {{/if}}
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
+        <div class="col-md-6 border-start ps-5 my-auto">
+          <h5>Delivery Address</h5>
+          <p class="mb-1">{{this.delivaryAddress.name}}</p>
+          <p class="mb-1">{{this.delivaryAddress.addressLine}}</p>
+          <p class="mb-1">{{this.delivaryAddress.city}} - {{this.delivaryAddress.pincode}}</p>
+          <p class="mb-0">{{this.delivaryAddress.mobile}}</p>
         </div>
       </div>
-    {{/each}}
+
+      <hr>
+
+      <!-- Ordered Items Table -->
+      <h5>Items Ordered</h5>
+      <table class="table table-sm table-bordered mt-3">
+        <thead class="table-light text-center">
+          <tr>
+            <th>#</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each this.OrderProducts.products}}
+          <tr class="text-center align-middle">
+            <td>{{inc @index}}</td>
+            <td>
+              <img src="/product-images/{{this.productInfo._id}}.jpg" alt="" width="70">
+            </td>
+            <td>{{this.productInfo.Name}}</td>
+            <td>{{this.quantity}}</td>
+            {{#if @first}}
+            <td rowspan="{{../OrderProducts.products.length}}">
+              <a href="/ordered-products?orderId={{order._id}}" class="btn btn-outline-success m-2">View Details</a>
+            </td>
+            {{/if}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{/each}}
   {{else}}
-    <p class="text-muted">You haven't placed any orders yet.</p>
+  <p class="text-muted">You haven't placed any orders yet.</p>
   {{/if}}
 </div>

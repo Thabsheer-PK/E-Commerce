@@ -13,7 +13,6 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
   } else {
     res.redirect('/login')
   }
-
 }
 async function getCartTotalPrice(userId) {
   try {
@@ -154,15 +153,23 @@ router.post('/place-order', async (req, res, next) => {
       res.json({ codSuccess: true })
     } else {
       const razorpayOrder = await userHelpers.generateRazorpay(orderId, totalAmount)
-      res.json({ razorpayOrder })
+      if (razorpayOrder) {
+        res.json({ razorpayOrder })
+      }
+
     }
   })
 })
 
-router.get('/order-success', async (req, res, next) => {
+router.get('/order-result', async (req, res, next) => {
   let user = req.session.user;
   let cartQty = await userHelpers.getCartQuantity(req.session.user._id)
-  res.render('user/order-success', { user, cartQty })
+  
+  let orderResult = true;
+  if (req.query) {
+    orderResult = false
+  }
+  res.render('user/order-result', { user, cartQty, succsses: orderResult })
 })
 router.get('/orders', async (req, res, next) => {
   let user = req.session.user
@@ -192,8 +199,10 @@ router.get('/profile', async (req, res, next) => {
 })
 
 router.post('/verify-payment', async (req, res, next) => {
-  userHelpers.verifyPayment(req.body).then(() => {
-
+  userHelpers.verifyPayment(req.body).then((response) => {
+    if (response.status) {
+      res.json({ response })
+    }
   })
 
 })

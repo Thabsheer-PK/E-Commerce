@@ -1,7 +1,11 @@
 <div class="container mt-5 text-center">
+  {{#if succsses}}
   <h2 class="text-success">🎉 Congratulations, {{user.Name}}!</h2>
   <p class="mt-3 fs-5">Your order has been placed successfully.</p>
   <p>You can track your order in your order history.</p>
-
+  {{else}}
+  <h2 class="text-success text-danger">Payment Failed!</h2>
+  <p class="mt-3 fs-5">Your order has been pending check your orders</p>
+  {{/if}}
   <a href="/orders" class="btn btn-primary mt-4">Go to My Orders</a>
 </div>
