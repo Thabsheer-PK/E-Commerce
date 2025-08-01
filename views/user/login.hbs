@@ -1,4 +1,4 @@
-<section class="d-flex align-items-center bg-light with-header">
+<section class="d-flex align-items-center bg-light" style="min-height: 100vh;">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
@@ -6,7 +6,7 @@
           <div class="card-body p-4">
             <h3 class="mb-4 text-center text-primary">Login</h3>
 
-            <form action="/login" method="post" id="loginForm" novalidate>
+            <form action="/login" method="post" id="userLoginForm" novalidate>
               <div class="mb-3">
                 <label for="InputEmail1" class="form-label">Email address</label>
                 <input type="email" class="form-control" id="InputEmail1" name="Email" required
@@ -22,21 +22,15 @@
               <div class="mb-3">
                 <label for="InputPassword1" class="form-label">Password</label>
                 <input type="password" class="form-control" id="InputPassword1" name="Password" required
-                  placeholder="Your password">
-                <div class="invalid-feedback">Please enter your password.</div>
+                  placeholder="Enter your password">
               </div>
-
-              <!-- Login error -->
-              {{#if loginErr}}
-              <p class="text-danger text-center small">{{loginErr}}</p>
-              {{/if}}
-
-              <!-- Submit -->
+ 
+              <p class="text-danger text-center small form-error"></p>
+    
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-success">Login</button>
               </div>
 
-              <!-- Link to signup -->
               <div class="text-center mt-3">
                 <a href="/signup" class="text-decoration-none">Don't have an account? Sign up</a>
               </div>

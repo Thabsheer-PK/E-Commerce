@@ -5,8 +5,7 @@
         <div class="card shadow-lg border-0">
           <div class="card-body p-4">
             <h3 class="mb-4 text-center text-danger">Admin Login</h3>
-
-            <form id="adminLoginForm" novalidate>
+            <form action="/admin/login" id="adminLoginForm" novalidate method="post">
               <div class="mb-3">
                 <label for="adminName" class="form-label">Username</label>
                 <input type="text" class="form-control" id="adminName" name="username" required
@@ -20,7 +19,7 @@
                 <div class="invalid-feedback">Please enter your password.</div>
               </div>
 
-              <p class="text-danger text-center small" id="loginErr"></p>
+              <p class="text-danger text-center small form-error"></p>
 
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-danger">Login</button>

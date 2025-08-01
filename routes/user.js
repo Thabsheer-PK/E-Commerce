@@ -31,8 +31,8 @@ async function getCartTotalPrice(userId) {
   }
 }
 
-/* GET home page. */
 router.get('/', async function (req, res, next) {
+  res.set('Cache-Control', 'no-store');
   let user = req.session.user;
   let cartQty = 0;
   if (user) {
@@ -48,11 +48,10 @@ router.get('/', async function (req, res, next) {
 
 router.get('/login', (req, res, next) => {
   res.set('Cache-Control', 'no-store'); //no cache stored in browser
-  console.log(req.session.user);
   if (req.session.user && req.session.user.Loggedin) {
     res.redirect('/');
   } else {
-    res.render('user/login', { loginErr: req.session.userLoginErr })
+    res.render('user/login')
   }
 
 })
@@ -61,12 +60,13 @@ router.post('/login', (req, res) => {
     if (response.status) {
       req.session.user = response.user;
       req.session.user.Loggedin = true;
-      res.redirect('/');
+      res.json({ status: true })
     } else {
-      req.session.userLoginErr = "inavlid username or password";
-      res.redirect('/login');
+      res.json({ status: false, message: response.message })
     }
   })
+
+
 })
 router.get('/logout', (req, res, next) => {
   req.session.user = null;
@@ -83,13 +83,15 @@ router.get('/signup', (req, res, next) => {
 
 })
 router.post('/signup', (req, res, next) => {
-  userHelpers.doSignup(req.body).then((user) => {
-    req.session.user = user;
-    req.session.user.Loggedin = true;
-    
-    res.redirect('/');
+  userHelpers.doSignup(req.body).then((response) => {
+    if (response.status) {
+      req.session.user = response.user;
+      req.session.user.Loggedin = true;
+      res.json({ status: true })
+    } else {
+      res.json({ status: false, message: response.message })
+    }
   })
-
 })
 
 router.get('/cart', verifyLogin, async (req, res, next) => {
@@ -190,10 +192,10 @@ router.get('/profile', async (req, res, next) => {
 })
 
 router.post('/verify-payment', async (req, res, next) => {
-  userHelpers.verifyPayment(req.body).then(()=>{
+  userHelpers.verifyPayment(req.body).then(() => {
 
   })
-  
+
 })
 
 module.exports = router;

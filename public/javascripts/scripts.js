@@ -138,28 +138,33 @@ function removeFromCart(cartId, productId) {
 }
 
 $(document).ready(function () {
-  $('#adminLoginForm').submit(function (e) {
+  handleAjaxForm('#adminLoginForm', '/admin');
+  handleAjaxForm('#userLoginForm','/');
+  handleAjaxForm('#userSignupForm','/');
+})
+function handleAjaxForm(selector, successRedirect = null) {
+  console.log('in handle function');
+  $(selector).submit(function (e) {
     e.preventDefault();
     let formData = {};
-    //convert into object
     $(this).serializeArray().forEach((field) => {
-      formData[field.name] = field.value
+      formData[field.name] = field.value;
     })
-    console.log('form data',formData);
+    let actionURL = $(this).attr('action') || window.location.pathname;
+    let method = $(this).attr('method') || 'post'
     $.ajax({
-      url: '/admin/login',
+      url: actionURL,
+      method: method,
       data: formData,
-      method: 'post',
       success: (response) => {
-        if(response.status){
-          window.location.href = '/admin'
-        }else{
-          $('#loginErr').text(response.message)
+        if (response.status && successRedirect) {
+          window.location.href = successRedirect;
+        } else {
+          $(this).find('.form-error').text(response.message)
         }
-        
       }
     })
   })
-})
+}
 
 

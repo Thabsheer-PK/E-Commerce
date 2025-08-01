@@ -12,39 +12,62 @@ const crypto = require('crypto')
 module.exports = {
   doSignup: (userData) => {
     return new Promise(async (resolve, reject) => {
+      const rules = {
+        Name: { label: 'Name', required: true },
+        Email: { label: 'Email', required: true , pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Enter valid email'},
+        Password: { label: 'Password', required: true, minLength: 6 },
+        Mobile: { label: 'Mobile', required: true, pattern: /^[6-9]\d{9}$/g, patternMessage: 'Mobile number must be a valid 10-digit number starting with 6–9' }
+      }
+      let missingField = []
+      for (let field in rules) {
+        let value = userData[field]
+        let rule = rules[field]
+        if (rule.required && (!value || value.trim() === '')) {
+          missingField.push(rule.label)
+        } else if (rule.minLength && (value.length < rule.minLength)) {
+          return resolve({ status: false, message: `${rule.label} must be atleast ${rule.minLength} characters` })
+        } else if (rule.pattern && !rule.pattern.test(value)) {
+          return resolve({ status: false, message: rule.patternMessage || `${rule.label} is invalid` })
+        }
+      }
+      if (missingField.length > 0) {
+        return resolve({ status: false, message: `Please enter ${missingField.join(", ")}` })
+      }
       userData.Password = await bcrypt.hash(userData.Password, 10);
       getDB().collection(collection.USER_COLLECTION).insertOne(userData).then(async (data) => {
         let insertedId = data.insertedId;
         let user = await getDB().collection(collection.USER_COLLECTION).findOne({ _id: insertedId })
-        resolve(user)
+        resolve({ status: true, user })
       })
+
     })
   },
-  doLogin: async (userData) => {
-    try {
-      let response = {};
-      const user = await getDB().collection(collection.USER_COLLECTION).findOne({ Email: userData.Email });
-
-      if (user) {
-        const status = await bcrypt.compare(userData.Password, user.Password);
-        if (status) {
-          console.log('Login success');
-          response.user = user;
-          response.status = true;
-          return response;
-        } else {
-          console.log('Login failed - password mismatch');
-          return { status: false };
+  doLogin: (userData) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let missingField = [];
+        if (!userData.Email) missingField.push('Email')
+        if (!userData.Mobile) missingField.push('Mobile Number')
+        if (!userData.Password) missingField.push('Password')
+        if (missingField.length > 0) {
+          return resolve({ status: false, message: `Please enter ${missingField.join(" and ")}` })
         }
-      } else {
-        console.log('Login failed - user not found');
-        return { status: false };
+        const user = await getDB().collection(collection.USER_COLLECTION).findOne({ Email: userData.Email });
+        if (!user) {
+          return resolve({ staus: false, message: 'User not found' })
+        }
+        const match = await bcrypt.compare(userData.Password, user.Password);
+        if (match) {
+          return resolve({ status: true, user: user })
+        } else {
+          resolve({ status: false, message: 'Incorrect password' })
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        reject({ status: false, error: 'Something went wrong' });
       }
+    })
 
-    } catch (err) {
-      console.error('Login error:', err);
-      return { status: false, error: 'Something went wrong' };
-    }
   },
   addToCart: (productID, userID) => {
     return new Promise(async (resolve, reject) => {
