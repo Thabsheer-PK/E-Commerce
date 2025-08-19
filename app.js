@@ -56,6 +56,9 @@ app.engine('hbs', exphbs.engine({
         default: 
         return 'bg-primary'
       }
+    },
+    eq:(a,b)=>{
+      return a==b;
     }
   }
 }))

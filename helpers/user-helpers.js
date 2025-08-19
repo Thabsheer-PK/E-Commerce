@@ -14,7 +14,7 @@ module.exports = {
     return new Promise(async (resolve, reject) => {
       const rules = {
         Name: { label: 'Name', required: true },
-        Email: { label: 'Email', required: true , pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Enter valid email'},
+        Email: { label: 'Email', required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Enter valid email' },
         Password: { label: 'Password', required: true, minLength: 6 },
         Mobile: { label: 'Mobile', required: true, pattern: /^[6-9]\d{9}$/g, patternMessage: 'Mobile number must be a valid 10-digit number starting with 6–9' }
       }
@@ -44,27 +44,36 @@ module.exports = {
   },
   doLogin: (userData) => {
     return new Promise(async (resolve, reject) => {
-      try {
-        let missingField = [];
-        if (!userData.Email) missingField.push('Email')
-        if (!userData.Mobile) missingField.push('Mobile Number')
-        if (!userData.Password) missingField.push('Password')
-        if (missingField.length > 0) {
-          return resolve({ status: false, message: `Please enter ${missingField.join(" and ")}` })
+
+      const rules = {
+        Email: { label: 'Email', required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Enter valid email' },
+        Password: { label: 'Password', required: true, minLength: 6 },
+        Mobile: { label: 'Mobile', required: true, pattern: /^[6-9]\d{9}$/g, patternMessage: 'Mobile number must be a valid 10-digit number starting with 6–9' }
+      }
+      let missingField = []
+      for (let field in rules) {
+        let value = userData[field]
+        let rule = rules[field]
+        if (rule.required && (!value || value.trim() === '')) {
+          missingField.push(rule.label)
+        } else if (rule.minLength && (value.length < rule.minLength)) {
+          return resolve({ status: false, message: `${rule.label} must be atleast ${rule.minLength} characters` })
+        } else if (rule.pattern && !rule.pattern.test(value)) {
+          return resolve({ status: false, message: rule.patternMessage || `${rule.label} is invalid` })
         }
-        const user = await getDB().collection(collection.USER_COLLECTION).findOne({ Email: userData.Email });
-        if (!user) {
-          return resolve({ staus: false, message: 'User not found' })
-        }
-        const match = await bcrypt.compare(userData.Password, user.Password);
-        if (match) {
-          return resolve({ status: true, user: user })
-        } else {
-          resolve({ status: false, message: 'Incorrect password' })
-        }
-      } catch (err) {
-        console.error('Login error:', err);
-        reject({ status: false, error: 'Something went wrong' });
+      }
+      if (missingField.length > 0) {
+        return resolve({ status: false, message: `Please enter ${missingField.join(", ")}` })
+      }
+      const user = await getDB().collection(collection.USER_COLLECTION).findOne({ Email: userData.Email });
+      if (!user) {
+        return resolve({ staus: false, message: 'User not found' })
+      }
+      const match = await bcrypt.compare(userData.Password, user.Password);
+      if (match) {
+        return resolve({ status: true, user: user })
+      } else {
+        return resolve({ status: false, message: 'Incorrect password' })
       }
     })
 
@@ -572,7 +581,7 @@ module.exports = {
           //payment is verified
           //save payment info to DB
           await changePaymentStatus(order_id)
-          resolve({status:true})
+          resolve({ status: true })
         } else {
           res.status(400).json({ status: false, message: 'invalid signature' })
         }

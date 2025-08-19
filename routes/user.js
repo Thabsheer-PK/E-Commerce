@@ -14,6 +14,12 @@ const verifyLogin = (req, res, next) => { //this we verify , without login we ca
     res.redirect('/login')
   }
 }
+const nocache = (req, res, next) => {
+  res.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.header('Pragma', 'no-cache');
+  res.header('Expires', '-1');
+  next();
+};
 async function getCartTotalPrice(userId) {
   try {
     const products = await userHelpers.getCartProducts(userId);
@@ -30,23 +36,21 @@ async function getCartTotalPrice(userId) {
   }
 }
 
-router.get('/', async function (req, res, next) {
-  res.set('Cache-Control', 'no-store');
+router.get('/', nocache,async function (req, res, next) {
   let user = req.session.user;
   let cartQty = 0;
-  if (user) {
-    cartQty = await userHelpers.getCartQuantity(req.session.user._id);
-  } else {
-    res.redirect('/login')
+  if(!user){
+     return res.redirect('/login')
   }
+  cartQty = await userHelpers.getCartQuantity(req.session.user._id);
+ 
 
   adminHelpers.getAllProducts().then((products) => {
     res.render('user/view-products', { admin: false, products, user, cartQty })
   })
 });
 
-router.get('/login', (req, res, next) => {
-  res.set('Cache-Control', 'no-store'); //no cache stored in browser
+router.get('/login', nocache, (req, res, next) => {
   if (req.session.user && req.session.user.Loggedin) {
     res.redirect('/');
   } else {
@@ -67,13 +71,12 @@ router.post('/login', (req, res) => {
 
 
 })
-router.get('/logout', (req, res, next) => {
+router.get('/logout', nocache, (req, res, next) => {
   req.session.user = null;
   res.redirect('/')
 })
 
-router.get('/signup', (req, res, next) => {
-  res.set('Cache-Control', 'no-store'); //no cache stored in browser
+router.get('/signup', nocache, (req, res, next) => {
   if (req.session.user && req.session.user.Loggedin) {
     res.redirect('/')
   } else {
@@ -166,7 +169,7 @@ router.get('/order-result', async (req, res, next) => {
   let cartQty = await userHelpers.getCartQuantity(req.session.user._id)
   
   let orderResult = true;
-  if (req.query) {
+  if (req.query.status == 'failed') {
     orderResult = false
   }
   res.render('user/order-result', { user, cartQty, succsses: orderResult })
@@ -188,7 +191,7 @@ router.get('/ordered-products', async (req, res, next) => {
   res.render('user/ordered-products', { products: order[0].OrderProducts.products, user, cartQty })
 })
 
-router.get('/profile', async (req, res, next) => {
+router.get('/profile', nocache, async (req, res, next) => {
   let user = req.session.user;
   if (!user) {
     return res.redirect('/login')
