@@ -1,26 +1,31 @@
-const { getDB } = require('../config/connect')
-const collection = require('../config/collections')
-const { ObjectId, LEGAL_TCP_SOCKET_OPTIONS } = require('mongodb');
-let bcrypt = require('bcrypt');
+const { getDB } = require('../config/connect');
+const collection = require('../config/collections');
+const { ObjectId } = require('mongodb');
+const bcrypt = require('bcrypt');
 
-createAdmin();
 async function createAdmin() {
   console.log('in create admin');
-  let hashedPass = await bcrypt.hash('admin123', 10)
-  let existing = await getDB().collection('admin').findOne({
+  const db = getDB(); // ← this will work ONLY after connectDB()
+
+  const existing = await db.collection('admin').findOne({
     username: 'admin'
-  })
+  });
+
   if (!existing) {
-    let admin = await getDB().collection('admin').insertOne({
+    const hashedPass = await bcrypt.hash('admin123', 10);
+
+    await db.collection('admin').insertOne({
       username: 'admin',
       password: hashedPass
-    })
-    console.log('admin created ', admin);
-  }
+    });
 
+    console.log('admin created');
+  }
 }
 
+
 module.exports = {
+  createAdmin,
   addProduct: async (product) => {
     await getDB().collection(collection.PRODUCT_COLLECTION).insertOne(product);
     return product._id.toString();//this return image id
@@ -95,11 +100,11 @@ module.exports = {
   },
 
   doAdminLogin: (details) => {
-    console.log('in details ',details);
+    console.log('in details ', details);
     return new Promise(async (resolve, reject) => {
       let admin = await getDB().collection('admin').findOne({ username: details.username });
       if (!admin) {
-       return resolve({ status: false, message: 'Admin not found' })
+        return resolve({ status: false, message: 'Admin not found' })
       }
       let match = await bcrypt.compare(details.password, admin.password)
       if (match) {
