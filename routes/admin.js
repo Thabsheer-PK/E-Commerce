@@ -3,6 +3,9 @@ var router = express.Router();
 const { getDB } = require('../config/connect');
 const adminHelpers = require('../helpers/admin-helpers');
 const { doLogin } = require('../helpers/user-helpers');
+const upload = require("../config/multer");
+
+
 
 const verifyAdmin = (req, res, next) => {
   if (req.session.adminloggedIn) {
@@ -50,7 +53,7 @@ router.get('/admin-logout', (req, res, next) => {
 })
 
 router.get('/', verifyAdmin, function (req, res, next) {
-   res.set('Cache-Control', 'no-store');
+  res.set('Cache-Control', 'no-store');
   if (req.session.admin) {
     adminHelpers.getAllProducts().then((products) => {
       res.render('admin/view-products', { admin: true, products })
@@ -65,12 +68,23 @@ router.get('/add-product', (req, res) => {
   res.render('admin/add-product-form', { admin: true })
 })
 
-router.post('/add-product', async (req, res) => {
-  const id = await adminHelpers.addProduct(req.body) //id have image id
-  let image = req.files.Image;
-  await image.mv('./public/product-images/' + id + '.jpg')//imag save this path
-  res.render('admin/add-product-form', { admin: true });
-})
+router.post('/add-product',upload.single('Image'),async (req, res) => {
+
+    const product = {
+      Name: req.body.Name,
+      Category: req.body.Category,
+      Price: req.body.Price,
+      Description: req.body.Description,
+      Image: req.file.path, // Cloudinary URL
+    };
+
+    await adminHelpers.addProduct(product);
+    res.render('admin/add-product-form', { admin: true });
+  }
+);
+
+
+
 
 router.get('/deleteProduct/:id', (req, res, next) => {
   let productID = req.params.id;
@@ -85,21 +99,25 @@ router.get('/editProduct/:id', async (req, res, next) => {
   res.render('admin/edit-product', { product, admin: true });
 })
 
-router.post('/edit-product/:id', async (req, res) => {
-  adminHelpers.updateProduct(req.params.id, req.body).then(() => {
-    let id = req.params.id;
-    if (req.files.Image) {
-      let image = req.files.Image;
-      image.mv('./public/product-images/' + id + '.jpg', (err) => {
-        if (err) {
-          console.log('uploading image error');
-        } else {
-          res.redirect('/admin/')
-        }
-      })
+router.post('/edit-product/:id',upload.single('Image'),async (req, res) => {
+
+    const productDetails = {
+      Name: req.body.Name,
+      Category: req.body.Category,
+      Description: req.body.Description,
+      Price: req.body.Price,
+    };
+
+    // If new image uploaded
+    if (req.file) {
+      productDetails.Image = req.file.path; // Cloudinary URL
     }
-  })
-})
+
+    await adminHelpers.updateProduct(req.params.id, productDetails);
+    res.redirect('/admin/');
+  }
+);
+
 
 router.get('/orders', (req, res, next) => {
   adminHelpers.getAllOrderes().then((orders) => {

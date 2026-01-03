@@ -27,9 +27,11 @@ async function createAdmin() {
 module.exports = {
   createAdmin,
   addProduct: async (product) => {
-    await getDB().collection(collection.PRODUCT_COLLECTION).insertOne(product);
-    return product._id.toString();//this return image id
-  },
+    const result = await getDB().collection(collection.PRODUCT_COLLECTION).insertOne(product);
+
+    return result.insertedId.toString();
+  }
+  ,
   getAllProducts: () => { // can deal with asyn or callback or promise ,now we with deal promise
     return new Promise(async (resolve, reject) => {
       let products = await getDB().collection(collection.PRODUCT_COLLECTION).find().toArray();
@@ -58,19 +60,12 @@ module.exports = {
     })
   },
   updateProduct: (productID, productDetails) => {
-    return new Promise((resolve, reject) => {
-      getDB().collection(collection.PRODUCT_COLLECTION).updateOne({ _id: new ObjectId(productID) }, {
-        $set: {
-          Name: productDetails.Name,
-          Category: productDetails.Category,
-          Description: productDetails.Description,
-          Price: productDetails.Price
-
-        }
-      }).then((response) => {
-        resolve(response);
-      })
-    })
+    return getDB()
+      .collection(collection.PRODUCT_COLLECTION)
+      .updateOne(
+        { _id: new ObjectId(productID) },
+        { $set: productDetails }
+      );
   },
   getAllOrderes: () => {
     return new Promise(async (resolve, reject) => {
