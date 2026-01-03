@@ -10,7 +10,6 @@ require('dotenv').config(); // OK for local, ignored by Render
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
 var exphbs = require('express-handlebars');
-var fileUpload = require('express-fileupload');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
