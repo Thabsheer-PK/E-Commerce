@@ -21,7 +21,7 @@
             {{#each orderItems}}
             <tr>
               <td>{{inc @index}}</td>
-              <td><img src="/product-images/{{this.product._id}}.jpg" width="60"></td>
+              <td><img src="{{this.product.Image}}" width="60"></td>
               <td>{{this.product.Name}}</td>
               <td>{{priceFormat this.product.Price}}</td>
               <td>{{this.quantity}}</td>

@@ -2,32 +2,61 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0">
+        <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-4">
-            <h3 class="mb-4 text-center text-danger">Admin Login</h3>
-            <form action="/admin/login" id="adminLoginForm" novalidate method="post">
+
+            <!-- Title -->
+            <h3 class="mb-3 text-center text-danger fw-bold">
+              🔐 Admin Login
+            </h3>
+            <p class="text-center text-muted small mb-4">
+              Authorized access only
+            </p>
+
+            <!-- Login Form -->
+            <form action="/admin/login" method="POST" novalidate>
+
+              <!-- Username -->
               <div class="mb-3">
-                <label for="adminName" class="form-label">Username</label>
-                <input type="text" class="form-control" id="adminName" name="username" required
-                  placeholder="Enter admin name">
+                <label class="form-label">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="username"
+                  placeholder="Enter admin username"
+                  required
+                >
               </div>
 
+              <!-- Password -->
               <div class="mb-3">
-                <label for="adminPassword" class="form-label">Password</label>
-                <input type="password" class="form-control" id="adminPassword" name="password" required
-                  placeholder="Your admin password">
-                <div class="invalid-feedback">Please enter your password.</div>
+                <label class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  placeholder="Enter admin password"
+                  required
+                >
               </div>
 
+              <!-- Error message -->
               <p class="text-danger text-center small form-error"></p>
 
+              <!-- Login Button -->
               <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-danger">Login</button>
+                <button type="submit" class="btn btn-danger rounded-pill">
+                  Login
+                </button>
               </div>
 
+              <!-- User Login Link -->
               <div class="text-center mt-3">
-                <a href="/login" class="text-decoration-none small">Login as User</a>
+                <a href="/login" class="text-decoration-none small text-muted">
+                  Login as User
+                </a>
               </div>
+
             </form>
           </div>
         </div>

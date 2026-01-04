@@ -36,14 +36,14 @@ async function getCartTotalPrice(userId) {
   }
 }
 
-router.get('/', nocache,async function (req, res, next) {
+router.get('/', nocache, async function (req, res, next) {
   let user = req.session.user;
   let cartQty = 0;
-  if(!user){
-     return res.redirect('/login')
+  if (!user) {
+    return res.redirect('/login')
   }
   cartQty = await userHelpers.getCartQuantity(req.session.user._id);
- 
+
 
   adminHelpers.getAllProducts().then((products) => {
     res.render('user/view-products', { admin: false, products, user, cartQty })
@@ -110,19 +110,33 @@ router.get('/cart', verifyLogin, async (req, res, next) => {
 
 })
 
-router.post('/add-to-cart', (req, res, next) => {
+router.post('/add-to-cart', async (req, res, next) => {
   let userID = req.session.user._id;
   const { productID } = req.body;
   userHelpers.addToCart(productID, userID).then(() => {
     res.json({ status: true, productID })
   })
 })
-
-router.post('/change-count-qty', (req, res, next) => {
-  userHelpers.changeProductQty(req.body).then(() => {
-    res.json({ status: true })
-  })
+router.post('/check-product-in-cart', async (req, res, next) => {
+  let userID = req.session.user._id;
+  const { productID } = req.body;
+  const isExisting = await userHelpers.checkProductInCart(productID, userID);
+  return res.json({
+    exists: isExisting,
+    productID
+  });
 })
+
+router.post('/change-count-qty', async (req, res) => {
+  const response = await userHelpers.changeProductQty(req.body);
+
+  if (response.remove) {
+    return res.json({ remove: true });
+  }
+
+  res.json({ status: true });
+});
+
 
 router.post('/remove-from-cart', (req, res, next) => {
   userHelpers.removeFromCart(req.body).then(() => {
@@ -167,7 +181,7 @@ router.post('/place-order', async (req, res, next) => {
 router.get('/order-result', async (req, res, next) => {
   let user = req.session.user;
   let cartQty = await userHelpers.getCartQuantity(req.session.user._id)
-  
+
   let orderResult = true;
   if (req.query.status == 'failed') {
     orderResult = false

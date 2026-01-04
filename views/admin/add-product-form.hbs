@@ -7,52 +7,62 @@
             <h3 class="text-center mb-4">➕ Add New Product</h3>
 
             <form action="/admin/add-product" method="post" enctype="multipart/form-data">
+
               <!-- Name -->
               <div class="mb-3">
-                <label for="inputForName" class="form-label">Product Name</label>
-                <input id="inputForName" type="text" class="form-control" name="Name" required
-                  placeholder="Enter Product Name">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" name="Name" required>
               </div>
 
               <!-- Category -->
               <div class="mb-3">
-                <label for="inputForCategory" class="form-label">Category</label>
-                <input id="inputForCategory" type="text" class="form-control" name="Category" required
-                  placeholder="Enter Product Category">
+                <label class="form-label">Category</label>
+                <input type="text" class="form-control" name="Category" required>
               </div>
 
               <!-- Price -->
               <div class="mb-3">
-                <label for="inputForPrice" class="form-label">Price (₹)</label>
-                <input id="inputForPrice" type="number" class="form-control" name="Price" required
-                  placeholder="Enter Product Price" min="1">
+                <label class="form-label">Price (₹)</label>
+                <input type="number" class="form-control" name="Price" min="1" required>
               </div>
 
               <!-- Description -->
               <div class="mb-3">
-                <label for="inputForDescription" class="form-label">Description</label>
-                <textarea id="inputForDescription" class="form-control" name="Description" rows="3" required
-                  placeholder="Enter Product Description"></textarea>
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="Description" rows="3" required></textarea>
               </div>
 
               <!-- Image Upload -->
               <div class="mb-3">
-                <label for="inputForimage" class="form-label">Upload Product Image</label>
-                <input id="inputForimage" type="file" required class="form-control" name="Image" accept="image/*">
+                <label class="form-label">Upload Product Image</label>
+                <input
+                  id="inputForimage"
+                  type="file"
+                  class="form-control"
+                  name="Image"
+                  accept="image/*"
+                  required
+                >
               </div>
 
-              <!-- Live Preview -->
+              <!-- Image Preview -->
               <div class="text-center mb-3">
-                <img src="" id="viewImage" class="img-thumbnail rounded-3" style="width: 120px; display: none;"
-                  alt="Preview">
+                <img
+                  id="viewImage"
+                  class="img-thumbnail rounded-3"
+                  style="width:120px; display:none;"
+                  alt="Preview"
+                >
               </div>
 
-              <!-- Submit Button -->
               <div class="d-grid mt-3">
-                <button type="submit" class="btn btn-success rounded-pill">📦 Add Product</button>
+                <button type="submit" class="btn btn-success rounded-pill">
+                  📦 Add Product
+                </button>
               </div>
 
             </form>
+
           </div>
         </div>
       </div>
@@ -60,31 +70,22 @@
   </div>
 </section>
 
-<style>
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  input[type=number] {
-    -moz-appearance: textfield;
-  }
-</style>
-
-<!-- Live Image Preview -->
 <script>
-  document.getElementById('inputForimage').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    const image = document.getElementById('viewImage');
-    if (file) {
-      image.style.display = 'block';
-      image.src = URL.createObjectURL(file);
-      image.onload = () => {
-        URL.revokeObjectURL(image.src);
-      };
-    } else {
-      image.style.display = 'none';
-    }
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("inputForimage");
+    const preview = document.getElementById("viewImage");
+
+    if (!fileInput || !preview) return;
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const url = URL.createObjectURL(file);
+      preview.src = url;
+      preview.style.display = "block";
+
+      preview.onload = () => URL.revokeObjectURL(url);
+    });
   });
 </script>

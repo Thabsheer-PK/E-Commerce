@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 function extraNumericValue(textValue) {
   return parseFloat(textValue.replace(/[^0-9.]/g, ""))
 }
@@ -7,6 +9,25 @@ function formatINR(amount) {
     maximumFractionDigits: 0
   }).format(amount);
 }
+
+function checkExistingInCartMsg(productID) {
+  $.ajax({
+    url: '/check-product-in-cart',
+    data: {
+      productID
+    },
+    method: 'post',
+    success: (response) => {
+      if (response.exists) {
+        window.location.href = `/place-order-form?productId=${productID}`
+      } else {
+        addToCartBtnAjax(productID);
+        window.location.href = `/place-order-form?productId=${productID}`
+      }
+    }
+  })
+}
+
 
 function addToCartBtnAjax(productID) {
   $.ajax({
@@ -19,17 +40,13 @@ function addToCartBtnAjax(productID) {
       if (response.status) {
         let count = parseInt($(`#cart-count-header`).text()) || 0;
         $(`#cart-count-header`).text(count + 1)
-
-        let timeoutID;
+        // showMessage(productID, 'Added to cart', 'success');
+        const element = $(`.cart-message[data-product-id="${productID}"]`);
+        element.find('.message-text').text('Added to cart');
+        element.addClass('show');
         setTimeout(() => {
-          $(`.cart-message[data-product-id="${response.productID}"]`).addClass('cart-added-message')
-        }, 0)
-
-        clearTimeout(timeoutID)
-        timeoutID = setTimeout(() => {
-          $(`.cart-message[data-product-id="${response.productID}"]`).removeClass('cart-added-message')
-        }, 2000);
-
+          element.removeClass('show')
+        }, 2000)
 
 
       }
@@ -37,14 +54,27 @@ function addToCartBtnAjax(productID) {
   })
 }
 
+// function showMessage(productID, text, type = 'success') {
+//   const el = $(`.cart-message[data-product-id="${productID}"]`);
+//   el.find('.message-text').text(text);
+//   el.removeClass('success error')
+//     .addClass('show ' + type);
+//   setTimeout(() => {
+//     el.removeClass('show success error');
+//   }, 2000);
+// }
+
 function changeProductQty(cartId, productId, count) {
   // let isMobile = window.innerWidth < 768;
   // let layoutContainer = isMobile ? '.mobile-cart' : '.desktop-cart'
   let qtySpan = $(`.cart-items .product-qty[data-product-id="${productId}"]`)
   let currentQty = parseInt(qtySpan.text())
-  if (currentQty <= 1 && count == -1) {
-    return removeFromCart(cartId, productId)
+  if (currentQty === 1 && count === -1) {
+    // remove item instead of updating qty
+    removeFromCart(cartId, productId);
+    return;
   }
+
 
   $.ajax({
     url: '/change-count-qty',
@@ -55,6 +85,11 @@ function changeProductQty(cartId, productId, count) {
     },
     method: 'post',
     success: (response) => {
+      // If qty = 1 and minus clicked → remove item
+      if (response.remove) {
+        removeFromCart(cartId, productId);
+        return;
+      }
       if (response.status) {
 
         // quantity changing
@@ -86,8 +121,8 @@ function changeProductQty(cartId, productId, count) {
     }
   })
 }
-
 function removeFromCart(cartId, productId) {
+  console.log('in remove from cart funciton');
   if (confirm("Are you sure you want to remove this product from your cart?")) {
     $.ajax({
       url: '/remove-from-cart',
@@ -139,8 +174,8 @@ function removeFromCart(cartId, productId) {
 
 $(document).ready(function () {
   handleAjaxForm('#adminLoginForm', '/admin');
-  handleAjaxForm('#userLoginForm','/');
-  handleAjaxForm('#userSignupForm','/');
+  handleAjaxForm('#userLoginForm', '/');
+  handleAjaxForm('#userSignupForm', '/');
 })
 function handleAjaxForm(selector, successRedirect = null) {
   console.log('in handle function');

@@ -78,6 +78,21 @@ module.exports = {
     })
 
   },
+  checkProductInCart: (productID, userID) => {
+    return new Promise(async (resolve, reject) => {
+      let productExisting = await getDB().collection(collection.CART_COLLECTION).findOne(
+        {
+          user: new ObjectId(userID),
+          products: {$elemMatch: {item: new ObjectId(productID)}}
+        }
+      )
+      if(productExisting){
+        resolve({status: true, message: 'Product already in cart'})
+      }else{
+        resolve(false)
+      }
+    })
+  },
   addToCart: (productID, userID) => {
     return new Promise(async (resolve, reject) => {
       let productObj = {
@@ -200,17 +215,38 @@ module.exports = {
   },
 
   changeProductQty: (details) => {
-    return new Promise((resolve, reject) => {
-      let cartId = details.cartId
-      let productId = details.productId
-      let count = parseInt(details.count)
-      getDB().collection(collection.CART_COLLECTION).updateOne({ _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) }, {
-        $inc: { "products.$.quantity": count } // count 1 or -1, done properly
-      }).then((response) => {
-        resolve(response)
-      })
-    })
-  },
+  return new Promise(async (resolve, reject) => {
+    try {
+      let cartId = details.cartId;
+      let productId = details.productId;
+      let count = parseInt(details.count);
+
+      const cart = await getDB().collection(collection.CART_COLLECTION).findOne(
+        { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
+        { projection: { 'products.$': 1 } }
+      );
+
+      let currentQty = cart.products[0].quantity;
+
+      // 🔴 STOP qty going to 0 or -1
+      if (currentQty === 1 && count === -1) {
+        resolve({ remove: true });
+        return;
+      }
+
+      await getDB().collection(collection.CART_COLLECTION).updateOne(
+        { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
+        { $inc: { 'products.$.quantity': count } }
+      );
+
+      resolve({ status: true });
+
+    } catch (err) {
+      reject(err);
+    }
+  });
+},
+
 
   removeFromCart: (details) => {
     return new Promise((resolve, reject) => {
@@ -265,7 +301,8 @@ module.exports = {
               'product.Price': 1,
               'totalPrice': {
                 $multiply: ['$quantity', { $toDouble: '$product.Price' }]
-              }
+              },
+              'product.Image': 1,
             }
           }
         ]).toArray();
@@ -305,7 +342,8 @@ module.exports = {
               'product.Price': 1,
               'totalPrice': {
                 $multiply: ['$quantity', { $toDouble: '$product.Price' }]
-              }
+              },
+              'product.Image': 1
             }
           }
         ]).toArray();

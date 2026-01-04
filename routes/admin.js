@@ -5,8 +5,6 @@ const adminHelpers = require('../helpers/admin-helpers');
 const { doLogin } = require('../helpers/user-helpers');
 const upload = require("../config/multer");
 
-
-
 const verifyAdmin = (req, res, next) => {
   if (req.session.adminloggedIn) {
     next();
@@ -68,20 +66,29 @@ router.get('/add-product', (req, res) => {
   res.render('admin/add-product-form', { admin: true })
 })
 
-router.post('/add-product',upload.single('Image'),async (req, res) => {
+router.post('/add-product', upload.single('Image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send("Image upload failed");
+    }
 
+    
     const product = {
       Name: req.body.Name,
       Category: req.body.Category,
       Price: req.body.Price,
       Description: req.body.Description,
-      Image: req.file.path, // Cloudinary URL
+      Image: req.file.secure_url, // Cloudinary URL
     };
 
     await adminHelpers.addProduct(product);
-    res.render('admin/add-product-form', { admin: true });
+    res.redirect('/admin/');
+  } catch (err) {
+    console.error("Add product error:", err);
+    res.status(500).send("Add product failed");
   }
-);
+});
+
 
 
 
@@ -100,23 +107,27 @@ router.get('/editProduct/:id', async (req, res, next) => {
 })
 
 router.post('/edit-product/:id',upload.single('Image'),async (req, res) => {
+    try {
+      const productDetails = {
+        Name: req.body.Name,
+        Category: req.body.Category,
+        Description: req.body.Description,
+        Price: req.body.Price,
+      };
 
-    const productDetails = {
-      Name: req.body.Name,
-      Category: req.body.Category,
-      Description: req.body.Description,
-      Price: req.body.Price,
-    };
+      if (req.file) {
+        productDetails.Image = req.file.secure_url;
+      }
 
-    // If new image uploaded
-    if (req.file) {
-      productDetails.Image = req.file.path; // Cloudinary URL
+      await adminHelpers.updateProduct(req.params.id, productDetails);
+      res.redirect('/admin/');
+    } catch (err) {
+      console.error("Edit product error:", err);
+      res.status(500).send("Edit failed");
     }
-
-    await adminHelpers.updateProduct(req.params.id, productDetails);
-    res.redirect('/admin/');
   }
 );
+
 
 
 router.get('/orders', (req, res, next) => {

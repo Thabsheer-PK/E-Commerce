@@ -2,38 +2,78 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0">
+        <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-4">
-            <h3 class="mb-4 text-center text-primary">Login</h3>
 
+            <!-- Title -->
+            <h3 class="mb-3 text-center text-primary fw-bold">User Login</h3>
+            <p class="text-center text-muted small mb-4">
+              Login to continue shopping
+            </p>
+
+            <!-- User Login Form -->
             <form action="/login" method="post" id="userLoginForm" novalidate>
+
               <div class="mb-3">
-                <label for="InputEmail1" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="InputEmail1" name="Email" required
-                  placeholder="Enter your email">
-                <div class="invalid-feedback">Please enter a valid email address.</div>
+                <label class="form-label">Email address</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="Email"
+                  placeholder="Enter your email"
+                  required
+                >
               </div>
+
               <div class="mb-3">
-                <label for="InputMobile" class="form-label">Mobile Number</label>
-                <input type="tel" class="form-control" id="InputMobile" name="Mobile" pattern="\d{10}" required
-                  placeholder="10-digit number">
-                <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                <label class="form-label">Mobile Number</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  name="Mobile"
+                  pattern="\d{10}"
+                  placeholder="10-digit number"
+                  required
+                >
               </div>
+
               <div class="mb-3">
-                <label for="InputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="InputPassword1" name="Password" required
-                  placeholder="Enter your password">
+                <label class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="Password"
+                  placeholder="Enter your password"
+                  required
+                >
               </div>
 
               <p class="text-danger text-center small form-error"></p>
 
+              <!-- Login Button -->
               <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-success">Login</button>
+                <button type="submit" class="btn btn-success rounded-pill">
+                  Login
+                </button>
               </div>
 
+              <!-- Signup -->
               <div class="text-center mt-3">
-                <a href="/signup" class="text-decoration-none">Don't have an account? Sign up</a>
+                <a href="/signup" class="text-decoration-none">
+                  Don’t have an account? Sign up
+                </a>
               </div>
+
+              <!-- Divider -->
+              <hr class="my-4">
+
+              <!-- Admin Switch -->
+              <div class="text-center">
+                <a href="/admin" class="text-decoration-none text-danger fw-semibold small">
+                  🔐 Login as Admin
+                </a>
+              </div>
+
             </form>
 
           </div>
