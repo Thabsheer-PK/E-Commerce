@@ -1,11 +1,8 @@
 var express = require('express');
 const userHelpers = require('../helpers/user-helpers');
 const adminHelpers = require('../helpers/admin-helpers');
-const { getDB } = require('../config/connect');
-const collections = require('../config/collections');
 var router = express.Router();
 const session = require('express-session');
-const crypto = require('crypto')
 
 const verifyLogin = (req, res, next) => { //this we verify , without login we can't continue next page
   if (req.session.user && req.session.user.Loggedin) {
@@ -36,7 +33,7 @@ async function getCartTotalPrice(userId) {
   }
 }
 
-router.get('/', nocache, async function (req, res, next) {
+router.get('/', nocache, verifyLogin, async function (req, res, next) {
   let user = req.session.user;
   let cartQty = 0;
   if (!user) {
@@ -72,8 +69,11 @@ router.post('/login', (req, res) => {
 
 })
 router.get('/logout', nocache, (req, res, next) => {
-  req.session.user = null;
-  res.redirect('/')
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid')
+    res.redirect('/login')
+  })
+
 })
 
 router.get('/signup', nocache, (req, res, next) => {
@@ -96,7 +96,7 @@ router.post('/signup', (req, res, next) => {
   })
 })
 
-router.get('/cart', verifyLogin, async (req, res, next) => {
+router.get('/cart', nocache, verifyLogin, async (req, res, next) => {
   let cartQty = await userHelpers.getCartQuantity(req.session.user._id);
   let totalCartPrice = await getCartTotalPrice(req.session.user._id);
 
@@ -144,11 +144,12 @@ router.post('/remove-from-cart', (req, res, next) => {
   })
 })
 
-router.get('/place-order-form', async (req, res, next) => {
+router.get('/place-order-form', nocache, verifyLogin, async (req, res, next) => {
   let user = req.session.user;
   let cartQty = await userHelpers.getCartQuantity(user._id)
   if (req.query.productId) {
     userHelpers.getOrderProducts(user._id, req.query).then((orderItems) => {
+      if (!orderItems) return;
       let grandTotal = orderItems[0].totalPrice;
       res.render('user/place-order-form', { user, cartQty, orderItems, grandTotal })
     })
@@ -171,14 +172,19 @@ router.post('/place-order', async (req, res, next) => {
     } else {
       const razorpayOrder = await userHelpers.generateRazorpay(orderId, totalAmount)
       if (razorpayOrder) {
-        res.json({ razorpayOrder })
+        res.json({
+          codSuccess: false,
+          razorpayOrder: razorpayOrder,
+          razorpayKey: process.env.RAZORPAY_KEY_ID
+        });
+
       }
 
     }
   })
 })
 
-router.get('/order-result', async (req, res, next) => {
+router.get('/order-result', nocache, verifyLogin, async (req, res, next) => {
   let user = req.session.user;
   let cartQty = await userHelpers.getCartQuantity(req.session.user._id)
 
@@ -188,16 +194,16 @@ router.get('/order-result', async (req, res, next) => {
   }
   res.render('user/order-result', { user, cartQty, succsses: orderResult })
 })
-router.get('/orders', async (req, res, next) => {
+router.get('/orders', nocache, verifyLogin, async (req, res, next) => {
   let user = req.session.user
   let orders = await userHelpers.getOrderDetails(user._id)
   let cartQty = await userHelpers.getCartQuantity(user._id)
   // let products = await userHelpers.getOrderProducts(user._id)
-
+  console.log('ordered detail;s,',orders);
   res.render('user/orders', { user: user._id, orders, cartQty, user })
 })
 
-router.get('/ordered-products', async (req, res, next) => {
+router.get('/ordered-products', nocache, verifyLogin, async (req, res, next) => {
   let user = req.session.user;
   let orderId = req.query.orderId
   let order = await userHelpers.getViewOrderProducts(user._id, orderId);
@@ -205,7 +211,7 @@ router.get('/ordered-products', async (req, res, next) => {
   res.render('user/ordered-products', { products: order[0].OrderProducts.products, user, cartQty })
 })
 
-router.get('/profile', nocache, async (req, res, next) => {
+router.get('/profile', nocache, verifyLogin, async (req, res, next) => {
   let user = req.session.user;
   if (!user) {
     return res.redirect('/login')

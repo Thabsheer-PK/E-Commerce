@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
   $('#orderForm').submit(function (e) {
     e.preventDefault();
 
@@ -11,55 +10,51 @@ $(document).ready(function () {
       data: formData,
       success: (response) => {
         if (response.codSuccess) {
-          window.location.href = '/order-result';
+          window.location.href = '/order-result?status=success';
         } else {
-          razorpayPayment(response.razorpayOrder);
+          razorpayPayment(response); // ✅ pass FULL response
         }
       },
-      error: (xhr, status, err) => {
-        console.error("AJAX ERROR:");
+      error: () => {
+        alert('Order placement failed');
       }
     });
   });
 });
 
+function razorpayPayment(data) {
+  if (!data.razorpayKey) {
+    alert('Razorpay key missing');
+    console.error('razorpayKey missing', data);
+    return;
+  }
 
-function razorpayPayment(order) {
   var options = {
-    "key": "rzp_test_FXNzEBflDxqzt7", // Enter the Key ID generated from the Dashboard
-    "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "PK Shopping Cart",
-    "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
-    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response) {
-      verifyPayment(response, order)
+    key: data.razorpayKey,                // ✅ MUST exist
+    amount: data.razorpayOrder.amount,
+    currency: "INR",
+    name: "PK Shopping Cart",
+    description: "Order Payment",
+    order_id: data.razorpayOrder.id,
+
+    handler: function (response) {
+      verifyPayment(response, data.razorpayOrder);
     },
-    "modal":{
-      "ondismiss": function () {
-        window.location.href='/order-result?status=failed'
+
+    modal: {
+      ondismiss: function () {
+        window.location.href = '/order-result?status=failed';
       }
-    },
-    "prefill": {
-      "name": "Gaurav Kumar",
-      "email": "gaurav.kumar@example.com",
-      "contact": "9000090000"
-    },
-    "notes": {
-      "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-      "color": "#3399cc"
     }
   };
-  let rzp = new Razorpay(options)
-  rzp.open()
+
+  let rzp = new Razorpay(options);
+  rzp.open();
 }
 
 function verifyPayment(payment, order) {
   $.ajax({
-    url: 'verify-payment',
+    url: '/verify-payment',
     method: 'post',
     data: {
       razorpay_order_id: order.id,
@@ -70,10 +65,12 @@ function verifyPayment(payment, order) {
     success: (response) => {
       if (response.status) {
         window.location.href = '/order-result';
+      } else {
+        window.location.href = '/order-result';
       }
     },
     error: () => {
-      alert('Server error during verification');
+      alert('Payment verification failed');
     }
-  })
+  });
 }

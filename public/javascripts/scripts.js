@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 function extraNumericValue(textValue) {
   return parseFloat(textValue.replace(/[^0-9.]/g, ""))
 }
@@ -18,12 +16,10 @@ function checkExistingInCartMsg(productID) {
     },
     method: 'post',
     success: (response) => {
-      if (response.exists) {
-        window.location.href = `/place-order-form?productId=${productID}`
-      } else {
+      if (!response.exists) {
         addToCartBtnAjax(productID);
+      }      
         window.location.href = `/place-order-form?productId=${productID}`
-      }
     }
   })
 }
@@ -54,15 +50,6 @@ function addToCartBtnAjax(productID) {
   })
 }
 
-// function showMessage(productID, text, type = 'success') {
-//   const el = $(`.cart-message[data-product-id="${productID}"]`);
-//   el.find('.message-text').text(text);
-//   el.removeClass('success error')
-//     .addClass('show ' + type);
-//   setTimeout(() => {
-//     el.removeClass('show success error');
-//   }, 2000);
-// }
 
 function changeProductQty(cartId, productId, count) {
   // let isMobile = window.innerWidth < 768;

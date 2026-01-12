@@ -12,8 +12,14 @@ const verifyAdmin = (req, res, next) => {
     res.redirect('/admin/login')
   }
 }
+const nocache = (req, res, next) => {
+  res.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.header('Pragma', 'no-cache');
+  res.header('Expires', '-1');
+  next();
+};
 
-router.get('/login', async (req, res, next) => {
+router.get('/login', nocache, async (req, res, next) => {
   res.set('Cache-Control', 'no-store');
   if (req.session.admin) {
     res.redirect('/admin')
@@ -45,13 +51,15 @@ router.post('/login', async (req, res, next) => {
   }
 
 })
-router.get('/admin-logout', (req, res, next) => {
-  req.session.admin = null;
-  res.redirect('/admin/login')
-})
+router.get('/admin-logout', nocache, (req, res) => {
+  req.session.destroy(err => {
+    res.clearCookie('connect.sid');
+    res.redirect('/admin/login');
+  });
+});
 
-router.get('/', verifyAdmin, function (req, res, next) {
-  res.set('Cache-Control', 'no-store');
+
+router.get('/', nocache, verifyAdmin, function (req, res, next) {
   if (req.session.admin) {
     adminHelpers.getAllProducts().then((products) => {
       res.render('admin/view-products', { admin: true, products })
@@ -62,7 +70,7 @@ router.get('/', verifyAdmin, function (req, res, next) {
 
 });
 
-router.get('/add-product', (req, res) => {
+router.get('/add-product', nocache, verifyAdmin, (req, res) => {
   res.render('admin/add-product-form', { admin: true })
 })
 
@@ -72,7 +80,7 @@ router.post('/add-product', upload.single('Image'), async (req, res) => {
       return res.status(400).send("Image upload failed");
     }
 
-    
+
     const product = {
       Name: req.body.Name,
       Category: req.body.Category,
@@ -89,11 +97,7 @@ router.post('/add-product', upload.single('Image'), async (req, res) => {
   }
 });
 
-
-
-
-
-router.get('/deleteProduct/:id', (req, res, next) => {
+router.get('/deleteProduct/:id', nocache, verifyAdmin, (req, res, next) => {
   let productID = req.params.id;
   adminHelpers.deleteProduct(productID).then((response) => {
     console.log(response);
@@ -101,42 +105,40 @@ router.get('/deleteProduct/:id', (req, res, next) => {
   })
 })
 
-router.get('/editProduct/:id', async (req, res, next) => {
+router.get('/editProduct/:id', nocache, verifyAdmin, async (req, res, next) => {
   let product = await adminHelpers.getProductDetails(req.params.id)
   res.render('admin/edit-product', { product, admin: true });
 })
 
-router.post('/edit-product/:id',upload.single('Image'),async (req, res) => {
-    try {
-      const productDetails = {
-        Name: req.body.Name,
-        Category: req.body.Category,
-        Description: req.body.Description,
-        Price: req.body.Price,
-      };
+router.post('/edit-product/:id', upload.single('Image'), async (req, res) => {
+  try {
+    const productDetails = {
+      Name: req.body.Name,
+      Category: req.body.Category,
+      Description: req.body.Description,
+      Price: req.body.Price,
+    };
 
-      if (req.file) {
-        productDetails.Image = req.file.secure_url;
-      }
-
-      await adminHelpers.updateProduct(req.params.id, productDetails);
-      res.redirect('/admin/');
-    } catch (err) {
-      console.error("Edit product error:", err);
-      res.status(500).send("Edit failed");
+    if (req.file) {
+      productDetails.Image = req.file.secure_url;
     }
+
+    await adminHelpers.updateProduct(req.params.id, productDetails);
+    res.redirect('/admin/');
+  } catch (err) {
+    console.error("Edit product error:", err);
+    res.status(500).send("Edit failed");
   }
+}
 );
 
-
-
-router.get('/orders', (req, res, next) => {
+router.get('/orders', nocache, verifyAdmin, (req, res, next) => {
   adminHelpers.getAllOrderes().then((orders) => {
     res.render('admin/all-orders', { admin: true, orders })
   })
 })
 
-router.get('/users', (req, res, next) => {
+router.get('/users', nocache, verifyAdmin, (req, res, next) => {
   adminHelpers.getAllUsers().then((users) => {
     res.render('admin/all-users', { admin: true, users })
   })

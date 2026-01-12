@@ -3,11 +3,22 @@ const collection = require('../config/collections');
 const bcrypt = require('bcrypt');
 const { ObjectId } = require('mongodb');
 const Razorpay = require('razorpay');
-const razorpayInstance = new Razorpay({
-  key_id: 'rzp_test_FXNzEBflDxqzt7',
-  key_secret: 'an8yyUbjekvrxiONEnmJDJkX',
-});
 const crypto = require('crypto')
+
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+const changePaymentStatus = async (orderId) => {
+  console.log('CALLING changePaymentStatus');
+
+  await getDB().collection(collection.ORDER_COLLECTION).updateOne(
+    { _id: new ObjectId(orderId) },
+    { $set: { status: 'placed' } }
+  );
+};
+
 
 module.exports = {
   doSignup: (userData) => {
@@ -67,7 +78,7 @@ module.exports = {
       }
       const user = await getDB().collection(collection.USER_COLLECTION).findOne({ Email: userData.Email });
       if (!user) {
-        return resolve({ staus: false, message: 'User not found' })
+        return resolve({ status: false, message: 'User not found' })
       }
       const match = await bcrypt.compare(userData.Password, user.Password);
       if (match) {
@@ -83,12 +94,14 @@ module.exports = {
       let productExisting = await getDB().collection(collection.CART_COLLECTION).findOne(
         {
           user: new ObjectId(userID),
-          products: {$elemMatch: {item: new ObjectId(productID)}}
+          products: { $elemMatch: { item: new ObjectId(productID) } }
         }
       )
-      if(productExisting){
-        resolve({status: true, message: 'Product already in cart'})
-      }else{
+
+      console.log(productExisting);
+      if (productExisting) {
+        resolve({ status: true, message: 'Product already in cart' })
+      } else {
         resolve(false)
       }
     })
@@ -105,7 +118,6 @@ module.exports = {
         if (userCart) {
           let productExist = await userCart.products.findIndex(product => product.item == productID)
           if (productExist != -1) {
-            console.log('product exist');
             await getDB().collection(collection.CART_COLLECTION).updateOne({ user: new ObjectId(userID), 'products.item': new ObjectId(productID) },
               {
                 $inc: { 'products.$.quantity': 1 }
@@ -215,37 +227,37 @@ module.exports = {
   },
 
   changeProductQty: (details) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let cartId = details.cartId;
-      let productId = details.productId;
-      let count = parseInt(details.count);
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cartId = details.cartId;
+        let productId = details.productId;
+        let count = parseInt(details.count);
 
-      const cart = await getDB().collection(collection.CART_COLLECTION).findOne(
-        { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
-        { projection: { 'products.$': 1 } }
-      );
+        const cart = await getDB().collection(collection.CART_COLLECTION).findOne(
+          { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
+          { projection: { 'products.$': 1 } }
+        );
 
-      let currentQty = cart.products[0].quantity;
+        let currentQty = cart.products[0].quantity;
 
-      // 🔴 STOP qty going to 0 or -1
-      if (currentQty === 1 && count === -1) {
-        resolve({ remove: true });
-        return;
+        // 🔴 STOP qty going to 0 or -1
+        if (currentQty === 1 && count === -1) {
+          resolve({ remove: true });
+          return;
+        }
+
+        await getDB().collection(collection.CART_COLLECTION).updateOne(
+          { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
+          { $inc: { 'products.$.quantity': count } }
+        );
+
+        resolve({ status: true });
+
+      } catch (err) {
+        reject(err);
       }
-
-      await getDB().collection(collection.CART_COLLECTION).updateOne(
-        { _id: new ObjectId(cartId), 'products.item': new ObjectId(productId) },
-        { $inc: { 'products.$.quantity': count } }
-      );
-
-      resolve({ status: true });
-
-    } catch (err) {
-      reject(err);
-    }
-  });
-},
+    });
+  },
 
 
   removeFromCart: (details) => {
@@ -417,12 +429,19 @@ module.exports = {
             }
           }
         ]).toArray();
+
+        if (!orderProduct || orderProduct.length === 0) {
+          resolve(null);
+          return;
+        }
+
         let formatted = {
           _id: orderProduct[0]._id,
           user: orderProduct[0].user,
-          products: [orderProduct[0].products] // single object so manualy add array to products
-        }
-        resolve(formatted)
+          products: [orderProduct[0].products]
+        };
+        resolve(formatted);
+
 
       } else {
         getDB().collection(collection.CART_COLLECTION).findOne({
@@ -491,6 +510,7 @@ module.exports = {
           }
         }
       ]).sort({ date: -1 }).toArray()
+      console.log('order function', orderDetails);
       resolve(orderDetails);
     })
   },
@@ -504,57 +524,65 @@ module.exports = {
           }
         }, {
           $unwind: '$OrderProducts.products'
-        }, {
-          $lookup: {
-            from: collection.PRODUCT_COLLECTION,
-            localField: 'OrderProducts.products.item',
-            foreignField: '_id',
-            as: 'productDetails'
-          }
-        }, {
-          $unwind: '$productDetails'
-        }, {
+        },
+        {
           $addFields: {
-            'OrderProducts.products.productInfo': '$productDetails'
-          }
-        }, {
-          $group: {
-            _id: '$_id',
-            orderNumber: { $first: '$orderNumber' },
-            userId: { $first: '$userId' },
-            delivaryAddress: { $first: '$delivaryAddress' },
-            grandTotal: { $first: '$grandTotal' },
-            paymentMethod: { $first: '$paymentMethod' },
-            date: { $first: '$date' },
-            status: { $first: '$status' },
-            OrderProducts_duplicate: {
-              $first: {
-                _id: '$OrderProducts._id',
-                user: '$OrderProducts.user'
-              }
-            },
-            products: {
-              $push: '$OrderProducts.products'
+            "OrderProducts.products.item": {
+              $toObjectId: "$OrderProducts.products.item"
             }
           }
-        }, {
-          $addFields: {
-            OrderProducts: {
-              _id: 'OrderProducts_duplicate._id',
-              user: '$OrderProducts_duplicate.user',
-              products: '$products'
-            }
-          }
-        }, {
-          $project: {
-            products: 0,
-            OrderProducts_duplicate: 0
-          }
+        },
+        {
+        $lookup: {
+          from: collection.PRODUCT_COLLECTION,
+          localField: 'OrderProducts.products.item',
+          foreignField: '_id',
+          as: 'productDetails'
         }
+        }, {
+      $unwind: '$productDetails'
+    }, {
+      $addFields: {
+        'OrderProducts.products.productInfo': '$productDetails'
+      }
+    }, {
+      $group: {
+        _id: '$_id',
+        orderNumber: { $first: '$orderNumber' },
+        userId: { $first: '$userId' },
+        delivaryAddress: { $first: '$delivaryAddress' },
+        grandTotal: { $first: '$grandTotal' },
+        paymentMethod: { $first: '$paymentMethod' },
+        date: { $first: '$date' },
+        status: { $first: '$status' },
+        OrderProducts_duplicate: {
+          $first: {
+            _id: '$OrderProducts._id',
+            user: '$OrderProducts.user'
+          }
+        },
+        products: {
+          $push: '$OrderProducts.products'
+        }
+      }
+    }, {
+      $addFields: {
+        OrderProducts: {
+          _id: 'OrderProducts_duplicate._id',
+          user: '$OrderProducts_duplicate.user',
+          products: '$products'
+        }
+      }
+    }, {
+      $project: {
+        products: 0,
+        OrderProducts_duplicate: 0
+      }
+    }
       ]).toArray();
-      resolve(orderProducts);
-    })
-  },
+    resolve(orderProducts);
+  })
+},
   generateRazorpay: (orderId, totalAmount) => {
     return new Promise((resolve, reject) => {
       const options = {
@@ -573,60 +601,56 @@ module.exports = {
       })
     })
   },
-  getOrderAmount: (orderId) => {
-    return new Promise(async (resolve, reject) => {
-      let total = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
-        {
-          $match: {
-            _id: new ObjectId(orderId)
+    getOrderAmount: (orderId) => {
+      return new Promise(async (resolve, reject) => {
+        let total = await getDB().collection(collection.ORDER_COLLECTION).aggregate([
+          {
+            $match: {
+              _id: new ObjectId(orderId)
+            }
+          }, {
+            $project: {
+              grandTotal: 1
+            }
           }
-        }, {
-          $project: {
-            grandTotal: 1
+        ]).toArray()
+        let grandTotal = Number(total[0].grandTotal)
+        resolve(grandTotal)
+      })
+
+    },
+
+      verifyPayment: (details) => {
+        return new Promise(async (resolve, reject) => {
+
+          try {
+            const {
+              razorpay_order_id,
+              razorpay_payment_id,
+              razorpay_signature,
+              order_id
+            } = details;
+
+            const hmac = crypto.createHmac(
+              'sha256',
+              process.env.RAZORPAY_KEY_SECRET
+            );
+
+            hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+            const generatedSignature = hmac.digest('hex');
+
+            if (generatedSignature === razorpay_signature) {
+              await changePaymentStatus(order_id);
+              resolve({ status: true });
+            } else {
+              reject({ status: false, message: 'invalid signature' });
+            }
+          } catch (err) {
+            console.log('verification failed', err);
+            reject(err);
           }
-        }
-      ]).toArray()
-      let grandTotal = Number(total[0].grandTotal)
-      resolve(grandTotal)
-    })
-
-  },
-  changePaymentStatus: async (orderId) => {
-    await getDB().collection(collection.ORDER_COLLECTION).updateOne(
-      {
-        _id: new ObjectId(orderId)
-      }, {
-      $set: {
-        status: 'placed'
+        });
       }
-    }
-    )
-  },
-  verifyPayment: (details) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const {
-          razorpay_order_id,
-          razorpay_payment_id,
-          razorpay_signature,
-          order_id
-        } = details;
 
-        const hmac = crypto.createHmac('sha256', 'an8yyUbjekvrxiONEnmJDJkX')
-        hmac.update(razorpay_order_id + "|" + razorpay_payment_id)
-        const generatdSignature = hmac.digest('hex');
-        if (generatdSignature === razorpay_signature) {
-          //payment is verified
-          //save payment info to DB
-          await changePaymentStatus(order_id)
-          resolve({ status: true })
-        } else {
-          res.status(400).json({ status: false, message: 'invalid signature' })
-        }
-      } catch (err) {
-        console.log('verifiction failed', err);
-      }
-    })
-  }
 }
 
